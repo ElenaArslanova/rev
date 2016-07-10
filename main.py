@@ -25,12 +25,6 @@ class Game:
             self.board.print()
 
 
-def get_colour_of_other_player(colour):
-    if colour == WHITE:
-        return BLACK
-    return WHITE
-
-
-if __name__ == 'main':
+if __name__ == '__main__':
     game = Game()
     game.run()

@@ -1,3 +1,6 @@
+from settings import SIZE
+
+
 class Player:
     def __init__(self, colour):
         self.colour = colour
@@ -33,7 +36,7 @@ class HumanPlayer(Player):
 
     @staticmethod
     def parse_coordinates(x, y):
-        return int(y), ord(x) - ord('a')
+        return SIZE - int(y), ord(x) - ord('a')
 
 
 class NoMovesError(Exception):

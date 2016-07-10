@@ -72,7 +72,7 @@ class Board:
 
     def mark_move_in_direction(self, player_colour, cell, direction):
         x, y = cell.x, cell.y
-        opposite = get_colour_of_other_player(player_colour)
+        opposite = self.get_colour_of_other_player(player_colour)
         if not self.is_on_board(x, y):
             return
         next_move = self.get_next_move_in_direction(x, y, direction)
@@ -99,7 +99,7 @@ class Board:
                  for cell in self.get_moves(player_colour)]
         if coordinates not in moves or not self.is_on_board(x, y):
             raise ValueError
-        opposite = get_colour_of_other_player(player_colour)
+        opposite = self.get_colour_of_other_player(player_colour)
         current_cell = self.board[x][y]
         if player_colour == WHITE:
             current_cell.set_white()
@@ -123,6 +123,12 @@ class Board:
             for cell_to_flip in flip:
                 cell_to_flip.flip()
         self.cell_count += 1
+
+    @staticmethod
+    def get_colour_of_other_player(colour):
+        if colour == WHITE:
+            return BLACK
+        return WHITE
 
     @staticmethod
     def get_next_move_in_direction(x, y, direction):
