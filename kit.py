@@ -1,11 +1,4 @@
-EMPTY, WHITE, BLACK = '.', 'O', 'X'
-SIZE = 8
-NORTH, NORTHEAST, NORTHWEST = [0, 1], [1, 1], [-1, 1]
-SOUTH, SOUTHEAST, SOUTHWEST = [0, -1], [1, -1], [-1, -1]
-EAST, WEST = [1, 0], [-1, 0]
-
-DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST,
-              NORTHWEST)
+from settings import *
 
 
 class Cell:
@@ -148,76 +141,3 @@ class Board:
     def print(self):
         for x in range(SIZE):
             print(''.join(str(cell) for cell in self.board[x]))
-
-
-class Player:
-    def __init__(self, colour):
-        self.colour = colour
-
-    def next_move(self, board):
-        pass
-
-
-class HumanPlayer(Player):
-    def __init__(self, colour):
-        super().__init__(colour)
-
-    def next_move(self, board):
-        move = None
-        while move is None:
-            player_input = input('Enter coordinates of your next move: ')
-            try:
-                if len(player_input) != 2:
-                    raise ValueError("Invalid coordinates")
-                x, y = player_input[0], player_input[1]
-                move = self.parse_coordinates(x, y)
-                possible_moves = [cell.get_coordinates() for cell in
-                                  board.get_moves(self.colour)]
-                if not possible_moves:
-                    raise NoMovesError
-                if move not in possible_moves:
-                    raise ValueError("Invalid coordinates")
-                return move
-
-            except (ValueError, NoMovesError) as e:
-                move = None
-                print(e)
-
-    @staticmethod
-    def parse_coordinates(x, y):
-        return int(y), ord(x) - ord('a')
-
-
-class Game:
-    def __init__(self):
-        self.player_1 = HumanPlayer(WHITE)
-        self.player_2 = HumanPlayer(BLACK)
-        self.board = Board()
-
-    def is_over(self):
-        return self.board.cell_count == SIZE ** 2
-
-    def run(self):
-        self.board.print()
-        while not self.is_over():
-            move_1 = self.player_1.next_move(self.board)
-            self.board.make_move(move_1, self.player_1.colour)
-            print()
-            self.board.print()
-            move_2 = self.player_2.next_move(self.board)
-            self.board.make_move(move_2, self.player_2.colour)
-            print()
-            self.board.print()
-
-
-class NoMovesError(Exception):
-    pass
-
-
-def get_colour_of_other_player(colour):
-    if colour == WHITE:
-        return BLACK
-    return WHITE
-
-game = Game()
-game.run()
