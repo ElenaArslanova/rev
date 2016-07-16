@@ -51,10 +51,10 @@ class Board:
         self.cell_count = 4
 
     def set_start_cells(self):
-        self.board[int(SIZE / 2) - 1][int(SIZE / 2) - 1].set_black()
-        self.board[int(SIZE / 2) - 1][int(SIZE / 2)].set_white()
-        self.board[int(SIZE / 2)][int(SIZE / 2) - 1].set_white()
-        self.board[int(SIZE / 2)][int(SIZE / 2)].set_black()
+        self.board[SIZE // 2 - 1][SIZE // 2 - 1].set_black()
+        self.board[SIZE // 2 - 1][SIZE // 2].set_white()
+        self.board[SIZE // 2][SIZE // 2 - 1].set_white()
+        self.board[SIZE // 2][SIZE // 2].set_black()
 
     def get_moves(self, player_colour):
         self.mark_valid_moves(player_colour)
@@ -95,11 +95,6 @@ class Board:
 
     def make_move(self, coordinates, player_colour):
         x, y = coordinates
-        moves = [cell.get_coordinates()
-                 for cell in self.get_moves(player_colour)]
-        if coordinates not in moves or not self.is_on_board(x, y):
-            raise ValueError
-        opposite = self.get_colour_of_other_player(player_colour)
         current_cell = self.board[x][y]
         if player_colour == WHITE:
             current_cell.set_white()
@@ -107,21 +102,26 @@ class Board:
             current_cell.set_black()
         for direction in DIRECTIONS:
             start = self.get_next_move_in_direction(x, y, direction)
+            if not self.is_on_board(start['x'], start['y']):
+                continue
             cell = self.board[start['x']][start['y']]
             flip = []
-            while cell.get_state() != EMPTY:
-                if cell.get_state() != player_colour:
-                    flip.append(cell)
-                    next_coord = self.get_next_move_in_direction(cell.x,
-                                                                 cell.y,
-                                                                 direction)
-                    cell = self.board[next_coord['x']][next_coord['y']]
-                    if not self.is_on_board(cell.x, cell.y):
-                        break
-                else:
+            cancel_flipping = False
+            while cell.get_state() != player_colour:
+                if cell.get_state() == EMPTY:
+                    cancel_flipping = True
                     break
-            for cell_to_flip in flip:
-                cell_to_flip.flip()
+                flip.append(cell)
+                next_coord = self.get_next_move_in_direction(cell.x, cell.y,
+                                                             direction)
+                if self.is_on_board(next_coord['x'], next_coord['y']):
+                    cell = self.board[next_coord['x']][next_coord['y']]
+                else:
+                    cancel_flipping = True
+                    break
+            if not cancel_flipping:
+                for cell_to_flip in flip:
+                    cell_to_flip.flip()
         self.cell_count += 1
 
     @staticmethod

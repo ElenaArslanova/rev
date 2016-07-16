@@ -5,8 +5,8 @@ from settings import *
 
 class Game:
     def __init__(self):
-        self.player_1 = HumanPlayer(WHITE)
-        self.player_2 = HumanPlayer(BLACK)
+        self.player_1 = HumanPlayer(BLACK)
+        self.player_2 = HumanPlayer(WHITE)
         self.board = Board()
 
     def is_over(self):
