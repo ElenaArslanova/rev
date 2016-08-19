@@ -19,6 +19,20 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(board.board[5][5].can_be_taken, False)
         board.clear_moves()
 
+    def test_valid_moves_start(self):
+        board = kit.Board()
+        board.mark_valid_moves(WHITE)
+        for i, j in zip([2, 3, 4, 5], [3, 2, 5, 4]):
+            self.assertEqual(board.board[i][j].can_be_taken, True)
+
+
+    def test_valid_moves_corner(self):
+        board = kit.Board()
+        board.board[1][7].set_black()
+        board.board[2][7].set_white()
+        board.mark_valid_moves(WHITE)
+        self.assertEqual(board.board[0][7].can_be_taken, True)
+
 
     def test_clear_moves(self):
         board = kit.Board()

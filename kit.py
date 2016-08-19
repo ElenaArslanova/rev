@@ -73,17 +73,17 @@ class Board:
     def mark_move_in_direction(self, player_colour, cell, direction):
         x, y = cell.x, cell.y
         opposite = self.get_colour_of_other_player(player_colour)
-        if not self.is_on_board(x, y):
-            return
         next_move = self.get_next_move_in_direction(x, y, direction)
+        if next_move is None:
+            return
         if self.board[next_move['x']][next_move['y']].get_state() == opposite:
             while self.board[next_move['x']][next_move['y']].get_state() == opposite:
-                if not self.is_on_board(next_move['x'], next_move['y']):
-                    break
-                else:
-                    next_move = self.get_next_move_in_direction(next_move['x'],
-                                                                next_move['y'],
-                                                                direction)
+                next_move = self.get_next_move_in_direction(next_move['x'],
+                                                            next_move['y'],
+                                                            direction)
+                if next_move is None:
+                    return
+            #print('before empty: x {} y {}'.format(next_move['x'], next_move['y']))
             if self.board[next_move['x']][next_move['y']].get_state() == EMPTY:
                 self.board[next_move['x']][next_move['y']].can_be_taken = True
 
@@ -102,7 +102,9 @@ class Board:
             current_cell.set_black()
         for direction in DIRECTIONS:
             start = self.get_next_move_in_direction(x, y, direction)
-            if not self.is_on_board(start['x'], start['y']):
+            # if not self.is_on_board(start['x'], start['y']):
+            #     continue
+            if start is None:
                 continue
             cell = self.board[start['x']][start['y']]
             flip = []
@@ -114,7 +116,8 @@ class Board:
                 flip.append(cell)
                 next_coord = self.get_next_move_in_direction(cell.x, cell.y,
                                                              direction)
-                if self.is_on_board(next_coord['x'], next_coord['y']):
+                # if self.is_on_board(next_coord['x'], next_coord['y']):
+                if next_coord is not None:
                     cell = self.board[next_coord['x']][next_coord['y']]
                 else:
                     cancel_flipping = True
@@ -130,9 +133,14 @@ class Board:
             return BLACK
         return WHITE
 
-    @staticmethod
-    def get_next_move_in_direction(x, y, direction):
-        return {'x': x + direction[0], 'y': y + direction[1]}
+    def get_next_move_in_direction(self, x, y, direction):
+        """
+        :return: coordinates of the next move, None if this move is not on the
+        board
+        """
+        next_move = {'x': x + direction[0], 'y': y + direction[1]}
+        if self.is_on_board(next_move['x'], next_move['y']):
+            return next_move
 
     @staticmethod
     def is_on_board(x, y):
