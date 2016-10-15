@@ -1,5 +1,8 @@
-import kit66666666666666666666
+import kit
+import unittest
+from settings import *
 
+class TestBoard(unittest.TestCase):
     def test_valid_moves_corner(self):
         board = kit.Board()
         board.board[1][7].set_black()

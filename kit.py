@@ -146,12 +146,20 @@ class Board:
     def is_on_board(x, y):
         return 0 <= x < SIZE and 0 <= y < SIZE
 
-    def reset(self):
+    def restart(self):
         for x in range(SIZE):
             for y in range(SIZE):
                 self.board[x][y] = Cell(x, y)
         self.set_start_cells()
+        self.cell_count = 4
 
     def print(self):
         for x in range(SIZE):
-            print(''.join(str(cell) for cell in self.board[x]))
+            print('{}{}'.format(SIZE - x,
+                                ''.join(str(cell) for cell in self.board[x])))
+        print(' {}'.format(''.join([chr(i + ord('a')) for i in range(SIZE)])))
+
+    def cells(self):
+        for x in range(SIZE):
+            for cell in self.board[x]:
+                yield cell
