@@ -13,7 +13,7 @@ class Game:
             self.mover = Mover()
 
     def is_over(self):
-        return (self.mover.board.cell_count == SIZE ** 2 or
+        return (self.mover.board.cell_count == self.mover.board.size ** 2 or
                 not self.mover.next_possible_moves)
 
     def next_move(self, coordinates):
