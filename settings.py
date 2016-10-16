@@ -1,5 +1,5 @@
 EMPTY, WHITE, BLACK = '.', 'O', 'X'
-SIZE = 8
+SIZE = 4
 FIRST = WHITE
 NORTH, NORTHEAST, NORTHWEST = [0, 1], [1, 1], [-1, 1]
 SOUTH, SOUTHEAST, SOUTHWEST = [0, -1], [1, -1], [-1, -1]

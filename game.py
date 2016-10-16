@@ -5,12 +5,16 @@ from player import Player
 from settings import *
 
 class Game:
-    def __init__(self, is_console_game):
+    TIE_MSG = "It's a tie!"
+    WHITE_MSG = 'White won!'
+    BLACK_MSG = 'Black won!'
+
+    def __init__(self, board_size, is_console_game):
         self.players = self.get_players()
         if is_console_game:
-            self.mover = ConsoleMover()
+            self.mover = ConsoleMover(board_size)
         else:
-            self.mover = Mover()
+            self.mover = Mover(board_size)
 
     def is_over(self):
         return (self.mover.board.cell_count == self.mover.board.size ** 2 or
@@ -32,11 +36,11 @@ class Game:
             elif cell.state == BLACK:
                 black_count += 1
         if white_count == black_count:
-            return "It's a tie!"
+            return self.TIE_MSG
         elif white_count > black_count:
-            return 'White won!'
+            return self.WHITE_MSG
         else:
-            return 'Black won!'
+            return self.BLACK_MSG
 
     def get_players(self):
         return cycle((Player(FIRST),

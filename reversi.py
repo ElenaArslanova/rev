@@ -16,7 +16,7 @@ class ReversiWindow(QMainWindow):
 
 
     def init_ui(self):
-        self.game = Game(is_console_game=False)
+        self.game = Game(SIZE, is_console_game=False)
         self.timer = QBasicTimer()
         self.load_images()
         self.resize(SIZE * IMG_SIZE, SIZE * IMG_SIZE)

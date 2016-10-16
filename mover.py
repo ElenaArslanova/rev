@@ -2,8 +2,8 @@ from settings import *
 from kit import Board
 
 class Mover:
-    def __init__(self):
-        self.board = Board(SIZE)
+    def __init__(self, board_size):
+        self.board = Board(board_size)
         self.next_possible_moves = self.get_start_possible_moves()
 
     def get_next_move(self, player, coordinates):
@@ -29,16 +29,14 @@ class Mover:
     def get_start_possible_moves(self):
         return self.get_possible_moves(FIRST)
 
-    @staticmethod
-    def parse_coordinates(coordinates):
+    def parse_coordinates(self, coordinates):
         x, y = coordinates.x(), coordinates.y()
         return y// IMG_SIZE, x // IMG_SIZE
 
 class ConsoleMover(Mover):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, board_size):
+        super().__init__(board_size)
 
-    @staticmethod
-    def parse_coordinates(coordinates):
+    def parse_coordinates(self, coordinates):
         x, y = coordinates[0], coordinates[1]
-        return SIZE - int(y), ord(x) - ord('a')
+        return self.board.size - int(y), ord(x) - ord('a')
