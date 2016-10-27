@@ -1,28 +1,28 @@
-from settings import *
+import settings as s
 
 
 class Cell:
     def __init__(self, x, y):
-        self.state = EMPTY
+        self.state = s.EMPTY
         #self.flipped = False
         self.can_be_taken = False
         self.x = x
         self.y = y
 
     def set_black(self):
-        self.state = BLACK
+        self.state = s.BLACK
 
     def set_white(self):
-        self.state = WHITE
+        self.state = s.WHITE
 
     def get_state(self):
         return self.state
 
     def flip(self):
-        if self.state == BLACK:
-            self.state = WHITE
-        elif self.state == WHITE:
-            self.state = BLACK
+        if self.state == s.BLACK:
+            self.state = s.WHITE
+        elif self.state == s.WHITE:
+            self.state = s.BLACK
         else:
             raise ValueError("Cell in {} state can't be flipped".format(self.state.lower()))
 
@@ -74,7 +74,7 @@ class Board:
                  for y in range(self.size))
         for cell in cells:
             if cell.get_state() == player_colour:
-                for direction in DIRECTIONS:
+                for direction in s.DIRECTIONS:
                     self.mark_move_in_direction(player_colour, cell, direction)
 
     def mark_move_in_direction(self, player_colour, cell, direction):
@@ -90,7 +90,7 @@ class Board:
                                                             direction)
                 if next_move is None:
                     return
-            if self.board[next_move['x']][next_move['y']].get_state() == EMPTY:
+            if self.board[next_move['x']][next_move['y']].get_state() == s.EMPTY:
                 self.board[next_move['x']][next_move['y']].can_be_taken = True
 
     def clear_moves(self):
@@ -103,11 +103,11 @@ class Board:
     def make_move(self, coordinates, player_colour):
         x, y = coordinates
         current_cell = self.board[x][y]
-        if player_colour == WHITE:
+        if player_colour == s.WHITE:
             current_cell.set_white()
         else:
             current_cell.set_black()
-        for direction in DIRECTIONS:
+        for direction in s.DIRECTIONS:
             start = self.get_next_move_in_direction(x, y, direction)
             if start is None:
                 continue
@@ -115,7 +115,7 @@ class Board:
             flip = []
             cancel_flipping = False
             while cell.get_state() != player_colour:
-                if cell.get_state() == EMPTY:
+                if cell.get_state() == s.EMPTY:
                     cancel_flipping = True
                     break
                 flip.append(cell)
@@ -133,9 +133,9 @@ class Board:
 
     @staticmethod
     def get_colour_of_other_player(colour):
-        if colour == WHITE:
-            return BLACK
-        return WHITE
+        if colour == s.WHITE:
+            return s.BLACK
+        return s.WHITE
 
     def get_next_move_in_direction(self, x, y, direction):
         """

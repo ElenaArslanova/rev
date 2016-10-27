@@ -1,6 +1,6 @@
 import sys, os
-from game import Game
-from settings import *
+from game.game import Game
+import settings as s
 from contextlib import contextmanager
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QDesktopWidget,
                              QMessageBox)
@@ -16,10 +16,11 @@ class ReversiWindow(QMainWindow):
 
 
     def init_ui(self):
-        self.game = Game(SIZE, is_console_game=False)
+        self.game = Game(s.SIZE, mode = s.Modes.human_human,
+                         is_console_game=False)
         self.timer = QBasicTimer()
         self.load_images()
-        self.resize(SIZE * IMG_SIZE, SIZE * IMG_SIZE)
+        self.resize(s.SIZE * s.IMG_SIZE, s.SIZE * s.IMG_SIZE)
         self.center()
         self.setWindowTitle('Reversi')
         self.show()
@@ -33,15 +34,15 @@ class ReversiWindow(QMainWindow):
 
     def drawCell(self, cell):
         with painter(self) as p:
-            if cell.state == BLACK:
+            if cell.state == s.BLACK:
                 image = self.images['black.png']
-            elif cell.state == WHITE:
+            elif cell.state == s.WHITE:
                 image = self.images['white.png']
             elif cell.get_coordinates() in self.game.mover.next_possible_moves:
                 image = self.images['possible_move.png']
             else:
                 image = self.images['empty.png']
-            p.drawImage(cell.y*IMG_SIZE, cell.x*IMG_SIZE, image)
+            p.drawImage(cell.y*s.IMG_SIZE, cell.x*s.IMG_SIZE, image)
 
 
     def load_images(self):
@@ -50,17 +51,17 @@ class ReversiWindow(QMainWindow):
             self.images[image] = QImage(os.path.join(images_path, image))
 
     def mousePressEvent(self, QMouseEvent):
-        try:
-            self.game.next_move(QMouseEvent.pos())
-        except ValueError:
-            self.game.repeat_player_move()
+        if self.game.game_state == s.States.human:
+            try:
+                self.game.next_move(QMouseEvent.pos())
+            except ValueError:
+                self.game.repeat_player_move()
         self.update()
 
     def timerEvent(self, event):
         if self.game.is_over():
             self.timer.stop()
             self.show_end_of_game_dialog()
-
 
     def paintEvent(self, event):
         for cell in self.game.mover.board.cells():

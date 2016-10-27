@@ -1,8 +1,9 @@
-from game import Game
-from settings import *
+from game.game import Game
+import settings
 
 def main():
-    game = Game(SIZE, is_console_game=True)
+    game = Game(settings.SIZE, mode=settings.Modes.human_human,
+                is_console_game=True)
     game.mover.board.print()
     while not game.is_over():
         player_input = input('Enter coordinates of your next move: ')
