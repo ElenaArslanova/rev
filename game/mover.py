@@ -7,13 +7,13 @@ class Mover:
         self.board = Board(board_size)
         self.next_possible_moves = self.get_start_possible_moves()
 
-    def get_next_move(self, player, coordinates):
+    def get_next_move(self, player, coordinates=None):
         move = player.next_move(coordinates)
         if move not in self.next_possible_moves:
             raise ValueError('Invalid coordinates')
         return move
 
-    def next_move(self, player, coordinates):
+    def next_move(self, player, coordinates=None):
         move = self.get_next_move(player, coordinates)
         self.board.make_move(move, player.colour)
         self.next_possible_moves = self.get_possible_moves(

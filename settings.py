@@ -1,6 +1,6 @@
 from enum import Enum
 
-EMPTY, WHITE, BLACK = '.', 'O', 'X'
+MOVE, EMPTY, WHITE, BLACK, TIE = 'Move', '.', 'O', 'X', 'Tie'
 SIZE = 8
 FIRST = WHITE
 NORTH, NORTHEAST, NORTHWEST = [0, 1], [1, 1], [-1, 1]

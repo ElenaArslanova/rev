@@ -16,14 +16,14 @@ class Game:
         self.mode = mode
         self.board_size = board_size
         self.is_console = is_console_game
-        self.players = self.get_players()
         self.mover = Mover(board_size)
+        self.players = self.get_players()
 
     def is_over(self):
         return (self.mover.board.cell_count == self.mover.board.size ** 2 or
                 not self.mover.next_possible_moves)
 
-    def next_move(self, coordinates):
+    def next_move(self, coordinates=None):
         if self.mode in self.REVERSING_MODES:
             self.reverse_game_state()
         player = next(self.players)
@@ -32,28 +32,22 @@ class Game:
     def repeat_player_move(self):
         next(self.players)
 
-    def get_winner(self):
-        white_count = 0
-        black_count = 0
-        for cell in self.mover.board.cells():
-            if cell.state == s.WHITE:
-                white_count += 1
-            elif cell.state == s.BLACK:
-                black_count += 1
-        if white_count == black_count:
-            return self.TIE_MSG
-        elif white_count > black_count:
+    def get_winner_message(self):
+        winner = self.get_winner(self.mover.board)
+        if winner == s.WHITE:
             return self.WHITE_MSG
-        else:
+        elif winner == s.BLACK:
             return self.BLACK_MSG
+        else:
+            return self.TIE_MSG
 
     def get_players(self):
         first = s.FIRST
         second = Board.get_colour_of_other_player(first)
         first_human_player = HumanPlayer(first, self.board_size, self.is_console)
         second_human_player = HumanPlayer(second, self.board_size, self.is_console)
-        first_ai_player = AIPlayer(first)
-        second_ai_player = AIPlayer(second)
+        first_ai_player = AIPlayer(first, self.mover.board)
+        second_ai_player = AIPlayer(second, self.mover.board)
         if self.mode == s.Modes.human_human:
             self.game_state = s.States.human
             players = cycle((first_human_player, second_human_player))
@@ -73,6 +67,38 @@ class Game:
             self.game_state = s.States.ai
         else:
             self.game_state = s.States.human
+
+    @staticmethod
+    def get_current_player(state):
+        return state[-1]
+
+    @staticmethod
+    def get_next_state(state, move_coordinates):
+        board, player = state
+        return (board.make_move(move_coordinates, player.colour),
+                Board.get_colour_of_other_player(player.colour))
+
+    def get_winner(self, board):
+        if not self.is_over():
+            return None
+        white_count, black_count = self.count_cells(board)
+        if white_count == black_count:
+            return s.TIE
+        elif white_count > black_count:
+            return s.WHITE
+        else:
+            return s.BLACK
+
+    @staticmethod
+    def count_cells(board):
+        white_count = 0
+        black_count = 0
+        for cell in board.cells():
+            if cell.state == s.WHITE:
+                white_count += 1
+            elif cell.state == s.BLACK:
+                black_count += 1
+        return (white_count, black_count)
 
     def restart(self):
         self.players = self.get_players()

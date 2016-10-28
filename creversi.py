@@ -16,7 +16,7 @@ def main():
         except ValueError as e:
             print(e)
             game.repeat_player_move()
-    print('The game is over! {}'.format(game.get_winner()))
+    print('The game is over! {}'.format(game.get_winner_message()))
 
 if __name__ == '__main__':
     main()

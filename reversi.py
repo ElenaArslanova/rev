@@ -16,7 +16,7 @@ class ReversiWindow(QMainWindow):
 
 
     def init_ui(self):
-        self.game = Game(s.SIZE, mode = s.Modes.human_human,
+        self.game = Game(s.SIZE, mode = s.Modes.human_ai,
                          is_console_game=False)
         self.timer = QBasicTimer()
         self.load_images()
@@ -56,12 +56,15 @@ class ReversiWindow(QMainWindow):
                 self.game.next_move(QMouseEvent.pos())
             except ValueError:
                 self.game.repeat_player_move()
-        self.update()
 
     def timerEvent(self, event):
         if self.game.is_over():
             self.timer.stop()
             self.show_end_of_game_dialog()
+        else:
+            if self.game.game_state == s.States.ai:
+                self.game.next_move()
+        self.update()
 
     def paintEvent(self, event):
         for cell in self.game.mover.board.cells():
@@ -70,7 +73,7 @@ class ReversiWindow(QMainWindow):
     def show_end_of_game_dialog(self):
         message_box = QMessageBox()
         message_box.setText('The game is over! {}'.format
-                            (self.game.get_winner()))
+                            (self.game.get_winner_message()))
         message_box.setInformativeText('Do you want to play again?')
         message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         self.check_answer(message_box.exec_())

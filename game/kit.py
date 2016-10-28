@@ -1,6 +1,5 @@
 import settings as s
 
-
 class Cell:
     def __init__(self, x, y):
         self.state = s.EMPTY

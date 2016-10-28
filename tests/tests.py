@@ -76,19 +76,19 @@ class TestGame(unittest.TestCase):
         self.assertTrue(not game.is_over())
         self.play_game_sequence(game, ['c1', 'b1', 'a3', 'd1'])
         self.assertTrue(game.is_over())
-        self.assertEqual(game.WHITE_MSG, game.get_winner())
+        self.assertEqual(game.WHITE_MSG, game.get_winner_message())
 
     def test_black_win(self):
         game = Game(3, s.Modes.human_human, True)
         self.assertTrue(not game.is_over())
         self.play_game_sequence(game, ['c2', 'c1', 'b1', 'a1'])
         self.assertTrue(game.is_over())
-        self.assertEqual(game.BLACK_MSG, game.get_winner())
+        self.assertEqual(game.BLACK_MSG, game.get_winner_message())
 
     def test_tie(self):
         game = Game(2, s.Modes.human_human, True)
         self.assertTrue(game.is_over())
-        self.assertEqual(game.TIE_MSG, game.get_winner())
+        self.assertEqual(game.TIE_MSG, game.get_winner_message())
 
     @staticmethod
     def play_game_sequence(game, sequence):
