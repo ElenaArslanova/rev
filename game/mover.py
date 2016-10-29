@@ -20,8 +20,7 @@ class Mover:
             Board.get_colour_of_other_player(player.colour))
 
     def get_possible_moves(self, player_colour):
-        return [cell.get_coordinates() for cell in
-                                  self.board.get_moves(player_colour)]
+        return [move for move in self.board.get_moves(player_colour)]
 
     def restart(self):
         self.board.restart()

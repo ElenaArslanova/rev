@@ -1,5 +1,5 @@
 from itertools import cycle
-
+from copy import deepcopy
 from game.kit import Board
 from game.mover import Mover
 from game.player import HumanPlayer, AIPlayer
@@ -46,8 +46,8 @@ class Game:
         second = Board.get_colour_of_other_player(first)
         first_human_player = HumanPlayer(first, self.board_size, self.is_console)
         second_human_player = HumanPlayer(second, self.board_size, self.is_console)
-        first_ai_player = AIPlayer(first, self.mover.board)
-        second_ai_player = AIPlayer(second, self.mover.board)
+        first_ai_player = AIPlayer(first, self)
+        second_ai_player = AIPlayer(second, self)
         if self.mode == s.Modes.human_human:
             self.game_state = s.States.human
             players = cycle((first_human_player, second_human_player))
@@ -68,15 +68,23 @@ class Game:
         else:
             self.game_state = s.States.human
 
-    @staticmethod
-    def get_current_player(state):
-        return state[-1]
+    # def get_current_player(self):
+    #     self.repeat_player_move()
+    #     return next(self.players)
+    #
+    # @staticmethod
+    # def get_current_state_player(state):
+    #     return state[-1]
 
     @staticmethod
     def get_next_state(state, move_coordinates):
-        board, player = state
-        return (board.make_move(move_coordinates, player.colour),
-                Board.get_colour_of_other_player(player.colour))
+        board, player = deepcopy(state[0]), state[1]
+        if move_coordinates is not None:
+            board.make_move(move_coordinates, player)
+        return (board, Board.get_colour_of_other_player(player))
+
+    # def get_current_state(self):
+    #     return (deepcopy(self.mover.board), self.get_current_player())
 
     def get_winner(self, board):
         if not self.is_over():

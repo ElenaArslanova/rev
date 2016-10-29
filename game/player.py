@@ -1,5 +1,5 @@
 from settings import IMG_SIZE
-from random import choice
+from game.mc import MC
 
 class Player:
     def __init__(self, colour):
@@ -28,10 +28,11 @@ class HumanPlayer(Player):
         return self.board_size - int(y), ord(x) - ord('a')
 
 class AIPlayer(Player):
-    def __init__(self, colour, board):
+    def __init__(self, colour, game):
         super().__init__(colour)
-        self.board = board
+        self.ai = MC(game, colour)
+        self.game = game
 
     def next_move(self, coordinates):
-        move = choice(self.board.get_moves(self.colour))
-        return move.get_coordinates()
+        # return choice(self.game.mover.board.get_moves(self.colour))
+        return self.ai.get_move((self.game.mover.board, self.colour))

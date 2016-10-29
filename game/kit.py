@@ -64,7 +64,7 @@ class Board:
         self.mark_valid_moves(player_colour)
         cells = (self.board[x][y] for x in range(self.size)
                  for y in range(self.size))
-        moves = [cell for cell in cells if cell.can_be_taken]
+        moves = [cell.get_coordinates() for cell in cells if cell.can_be_taken]
         self.clear_moves()
         return moves
 
@@ -166,3 +166,12 @@ class Board:
         for x in range(self.size):
             for cell in self.board[x]:
                 yield cell
+
+    def __eq__(self, other):
+        if not isinstance(other, Board):
+            return False
+        cells_pairs = zip(self.cells(), other.cells())
+        for cell1, cell2 in cells_pairs:
+            if cell1 != cell2:
+                return False
+        return True
