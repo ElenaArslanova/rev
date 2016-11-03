@@ -54,6 +54,7 @@ class ReversiWindow(QMainWindow):
         if self.game.game_state == s.States.human:
             try:
                 self.game.next_move(QMouseEvent.pos())
+                self.update()
             except ValueError:
                 self.game.repeat_player_move()
 
@@ -62,6 +63,7 @@ class ReversiWindow(QMainWindow):
             self.timer.stop()
             self.show_end_of_game_dialog()
         else:
+            self.game.check_player_pass()
             if self.game.game_state == s.States.ai:
                 self.game.next_move()
         self.update()

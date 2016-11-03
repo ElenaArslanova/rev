@@ -148,6 +148,12 @@ class Board:
     def is_on_board(self, x, y):
         return 0 <= x < self.size and 0 <= y < self.size
 
+    def someone_has_moves(self):
+        return self.has_moves(s.BLACK) or self.has_moves(s.WHITE)
+
+    def has_moves(self, colour):
+        return len(self.get_moves(colour)) > 0
+
     def restart(self):
         for x in range(self.size):
             for y in range(self.size):
@@ -166,6 +172,11 @@ class Board:
         for x in range(self.size):
             for cell in self.board[x]:
                 yield cell
+
+    def __hash__(self):
+        board_string = ''.join(cell.state for row in self.board
+                                for cell in row)
+        return hash(board_string)
 
     def __eq__(self, other):
         if not isinstance(other, Board):

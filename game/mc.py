@@ -8,7 +8,7 @@ class MC:
     def __init__(self, game, colour, **kwargs):
         self.colour = colour
         self.game = game
-        self.simulation_time = kwargs.get('time', 5)
+        self.simulation_time = kwargs.get('time', 1)
         self.state_node = {}
 
     def get_move(self, state):
@@ -21,19 +21,15 @@ class MC:
     def monte_carlo_search(self, state):
         results = {}
         root = None
-        try:
-            print(state)
-            print(state in self.state_node)
-        except Exception as e:
-            print(e)
         if state in self.state_node:
             root = self.state_node[state]
         else:
             children_amount = len(state[0].get_moves(state[1]))
-            if (not self.game.get_winner(state[1] == self.colour)
+            if (not self.game.get_winner(state[0]) == self.colour
                 and children_amount == 0):
                 children_amount = 1
             root = Node(state, None, children_amount)
+
         root.parent = None
         start = time.time()
         while (time.time() - start < self.simulation_time
@@ -133,7 +129,8 @@ class MC:
                 state = (state[0], kit.Board.get_colour_of_other_player(state[1]))
                 moves = state[0].get_moves(state[1])
             picked_move = choice(moves)
-            state = deepcopy(state[0]).make_move(picked_move, state[1])
+            # state = deepcopy(state[0]).make_move(picked_move, state[1])
+            state = self.game.get_next_state(state, picked_move)
 
     @staticmethod
     def get_ucb(wins, plays, parent_plays):

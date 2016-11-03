@@ -21,16 +21,32 @@ class Game:
 
     def is_over(self):
         return (self.mover.board.cell_count == self.mover.board.size ** 2 or
-                not self.mover.next_possible_moves)
+                not self.mover.board.someone_has_moves())
 
     def next_move(self, coordinates=None):
+        try:
+            player = next(self.players)
+            self.mover.next_move(player, coordinates)
+            self.reverse_mode_if_needed()
+        except Exception as e:
+            print(e)
+
+    def reverse_mode_if_needed(self):
         if self.mode in self.REVERSING_MODES:
             self.reverse_game_state()
-        player = next(self.players)
-        self.mover.next_move(player, coordinates)
+
+    def check_player_pass(self):
+        player = self.get_current_player()
+        if not self.mover.board.has_moves(player.colour):
+            self.mover.pass_move(player)
+            self.skip_player()
 
     def repeat_player_move(self):
         next(self.players)
+
+    def skip_player(self):
+        next(self.players)
+        self.reverse_mode_if_needed()
 
     def get_winner_message(self):
         winner = self.get_winner(self.mover.board)
@@ -68,10 +84,11 @@ class Game:
         else:
             self.game_state = s.States.human
 
-    # def get_current_player(self):
-    #     self.repeat_player_move()
-    #     return next(self.players)
-    #
+    def get_current_player(self):
+        current = next(self.players)
+        self.repeat_player_move()
+        return current
+
     # @staticmethod
     # def get_current_state_player(state):
     #     return state[-1]
@@ -87,15 +104,18 @@ class Game:
     #     return (deepcopy(self.mover.board), self.get_current_player())
 
     def get_winner(self, board):
-        if not self.is_over():
-            return None
         white_count, black_count = self.count_cells(board)
+        if (white_count + black_count != board.size ** 2 and
+                board.someone_has_moves()):
+            return None
         if white_count == black_count:
             return s.TIE
         elif white_count > black_count:
             return s.WHITE
         else:
             return s.BLACK
+
+
 
     @staticmethod
     def count_cells(board):

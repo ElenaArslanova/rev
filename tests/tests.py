@@ -90,6 +90,11 @@ class TestGame(unittest.TestCase):
         self.assertTrue(game.is_over())
         self.assertEqual(game.TIE_MSG, game.get_winner_message())
 
+    # def test_game_is_over(self):
+    #     game = Game(3, s.Modes.human_human, True)
+    #     self.play_game_sequence(game, ['b1', 'a1'])
+    #     self.assertTrue(game.is_over())
+
     def test_get_next_state(self):
         game = Game(3, s.Modes.human_human, True)
         state = (game.mover.board, s.WHITE)
@@ -98,6 +103,28 @@ class TestGame(unittest.TestCase):
         self.assertNotEquals(game.mover.board, next_state[0])
         game.mover.board.make_move((2, 1), s.WHITE)
         self.assertEquals(game.mover.board, next_state[0])
+
+    def test_get_current_player(self):
+        game = Game(3, s.Modes.human_human, True)
+        self.assertEquals(game.get_current_player().colour, s.WHITE)
+        game.next_move('c2')
+        self.assertEquals(game.get_current_player().colour, s.BLACK)
+
+    def test_skip_player(self):
+        game = Game(3, s.Modes.human_human, True)
+        self.assertEquals(game.get_current_player().colour, s.WHITE)
+        game.skip_player()
+        self.assertEquals(game.get_current_player().colour, s.BLACK)
+        game.skip_player()
+        self.assertEquals(game.get_current_player().colour, s.WHITE)
+
+    def test_repeat_player_move(self):
+        game = Game(3, s.Modes.human_human, True)
+        self.assertEquals(game.get_current_player().colour, s.WHITE)
+        game.next_move('c2')
+        self.assertEquals(game.get_current_player().colour, s.BLACK)
+        game.repeat_player_move()
+        self.assertEquals(game.get_current_player().colour, s.WHITE)
 
     @staticmethod
     def play_game_sequence(game, sequence):

@@ -6,6 +6,7 @@ def main():
                 is_console_game=True)
     game.mover.board.print()
     while not game.is_over():
+        game.check_player_pass()
         player_input = input('Enter coordinates of your next move: ')
         try:
             if len(player_input) != 2:
