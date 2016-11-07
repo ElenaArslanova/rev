@@ -121,9 +121,7 @@ class TestGame(unittest.TestCase):
     def test_repeat_player_move(self):
         game = Game(3, s.Modes.human_human, True)
         self.assertEquals(game.get_current_player().colour, s.WHITE)
-        game.next_move('c2')
-        self.assertEquals(game.get_current_player().colour, s.BLACK)
-        game.repeat_player_move()
+        game.next_move('c1')
         self.assertEquals(game.get_current_player().colour, s.WHITE)
 
     @staticmethod

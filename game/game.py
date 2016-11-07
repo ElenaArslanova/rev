@@ -28,6 +28,8 @@ class Game:
             player = next(self.players)
             self.mover.next_move(player, coordinates)
             self.reverse_mode_if_needed()
+        except ValueError:
+            self.repeat_player_move()
         except Exception as e:
             print(e)
 

@@ -1,6 +1,7 @@
 import sys, os
 from game.game import Game
 import settings as s
+import time
 from contextlib import contextmanager
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QDesktopWidget,
                              QMessageBox)
@@ -16,7 +17,7 @@ class ReversiWindow(QMainWindow):
 
 
     def init_ui(self):
-        self.game = Game(s.SIZE, mode = s.Modes.human_ai,
+        self.game = Game(s.SIZE, mode = s.Modes.human_human,
                          is_console_game=False)
         self.timer = QBasicTimer()
         self.load_images()
@@ -52,11 +53,8 @@ class ReversiWindow(QMainWindow):
 
     def mousePressEvent(self, QMouseEvent):
         if self.game.game_state == s.States.human:
-            try:
-                self.game.next_move(QMouseEvent.pos())
-                self.update()
-            except ValueError:
-                self.game.repeat_player_move()
+            self.game.next_move(QMouseEvent.pos())
+            self.update()
 
     def timerEvent(self, event):
         if self.game.is_over():
@@ -66,6 +64,8 @@ class ReversiWindow(QMainWindow):
             self.game.check_player_pass()
             if self.game.game_state == s.States.ai:
                 self.game.next_move()
+                # self.update()
+                # time.sleep(5)
         self.update()
 
     def paintEvent(self, event):
