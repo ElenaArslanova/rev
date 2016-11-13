@@ -1,12 +1,13 @@
 from game.game import Game
-import settings
+import argparser
 
 def main():
-    game = Game(settings.SIZE, mode=settings.Modes.human_human,
+    reversi_parser = argparser.create_parser()
+    namespace = reversi_parser.parse_args()
+    game = Game(namespace.size, mode=argparser.get_mode(namespace),
                 is_console_game=True)
     game.mover.board.print()
     while not game.is_over():
-        game.check_player_pass()
         player_input = input('Enter coordinates of your next move: ')
         try:
             if len(player_input) != 2:

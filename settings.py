@@ -1,7 +1,6 @@
 from enum import Enum
 
 MOVE, EMPTY, WHITE, BLACK, TIE = 'Move', '.', 'O', 'X', 'Tie'
-SIZE = 8
 FIRST = WHITE
 NORTH, NORTHEAST, NORTHWEST = [0, 1], [1, 1], [-1, 1]
 SOUTH, SOUTHEAST, SOUTHWEST = [0, -1], [1, -1], [-1, -1]

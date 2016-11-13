@@ -1,27 +1,31 @@
-import sys, os
-from game.game import Game
-import settings as s
-import time
+import os
+import sys
 from contextlib import contextmanager
+
+from PyQt5.QtCore import QBasicTimer, QThread
+from PyQt5.QtGui import QPainter, QImage
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QDesktopWidget,
                              QMessageBox)
-from PyQt5.QtGui import QPainter, QImage
-from PyQt5.QtCore import QBasicTimer
+
+import argparser
+import settings as s
+from game.game import Game
 
 
 class ReversiWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, board_size, game_mode):
         super().__init__()
         self.images = {}
-        self.init_ui()
+        self.init_ui(board_size, game_mode)
 
 
-    def init_ui(self):
-        self.game = Game(s.SIZE, mode = s.Modes.human_human,
-                         is_console_game=False)
+    def init_ui(self, board_size, game_mode):
+        self.game = Game(board_size, mode =game_mode, is_console_game=False)
         self.timer = QBasicTimer()
+        self.ai_thread = AIThread(self)
+        self.ai_thread.finished.connect(self.update)
         self.load_images()
-        self.resize(s.SIZE * s.IMG_SIZE, s.SIZE * s.IMG_SIZE)
+        self.resize(board_size * s.IMG_SIZE, board_size * s.IMG_SIZE)
         self.center()
         self.setWindowTitle('Reversi')
         self.show()
@@ -33,18 +37,23 @@ class ReversiWindow(QMainWindow):
         self.move((screen.width() - size.width()) / 2,
                   (screen.height() - size.height()) / 2)
 
-    def drawCell(self, cell):
-        with painter(self) as p:
-            if cell.state == s.BLACK:
-                image = self.images['black.png']
-            elif cell.state == s.WHITE:
-                image = self.images['white.png']
-            elif cell.get_coordinates() in self.game.mover.next_possible_moves:
-                image = self.images['possible_move.png']
-            else:
-                image = self.images['empty.png']
-            p.drawImage(cell.y*s.IMG_SIZE, cell.x*s.IMG_SIZE, image)
+    def draw_cell(self, painter, cell):
+        if cell.state == s.BLACK:
+            image = self.images['black.png']
+        elif cell.state == s.WHITE:
+            image = self.images['white.png']
+        elif cell.get_coordinates() in self.game.mover.next_possible_moves:
+              # and self.game.game_state != s.States.ai):
+            image = self.images['possible_move.png']
+        else:
+            image = self.images['empty.png']
+        painter.drawImage(cell.y*s.IMG_SIZE, cell.x*s.IMG_SIZE, image)
 
+
+    # def draw_text(self, painter):
+    #     painter.setPen(QColor(168, 34, 3))
+    #     painter.setFont(QFont('Decorative', 10))
+    #     painter.drawText(QPoint(s.SIZE * s.IMG_SIZE + 10, 50), self.game.get_current_player().colour)
 
     def load_images(self):
         images_path = os.path.join(os.getcwd(), 'images')
@@ -61,16 +70,15 @@ class ReversiWindow(QMainWindow):
             self.timer.stop()
             self.show_end_of_game_dialog()
         else:
-            self.game.check_player_pass()
             if self.game.game_state == s.States.ai:
-                self.game.next_move()
-                # self.update()
-                # time.sleep(5)
+                self.ai_thread.start()
         self.update()
 
     def paintEvent(self, event):
-        for cell in self.game.mover.board.cells():
-            self.drawCell(cell)
+        with painter(self) as p:
+            # self.draw_text(p)
+            for cell in self.game.mover.board.cells():
+                self.draw_cell(p, cell)
 
     def show_end_of_game_dialog(self):
         message_box = QMessageBox()
@@ -89,6 +97,15 @@ class ReversiWindow(QMainWindow):
             self.close()
 
 
+class AIThread(QThread):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+
+    def run(self):
+        self.app.game.next_move()
+
+
 @contextmanager
 def painter(pix):
     painter = QPainter()
@@ -98,7 +115,10 @@ def painter(pix):
 
 def main():
     app = QApplication(sys.argv)
-    reversi_window = ReversiWindow()
+    reversi_parser = argparser.create_parser()
+    namespace = reversi_parser.parse_args()
+    reversi_window = ReversiWindow(namespace.size,
+                                   argparser.get_mode(namespace))
     reversi_window.load_images()
     sys.exit(app.exec_())
 

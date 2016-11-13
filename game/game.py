@@ -18,6 +18,7 @@ class Game:
         self.is_console = is_console_game
         self.mover = Mover(board_size)
         self.players = self.get_players()
+        self.current_player = None
 
     def is_over(self):
         return (self.mover.board.cell_count == self.mover.board.size ** 2 or
@@ -26,8 +27,10 @@ class Game:
     def next_move(self, coordinates=None):
         try:
             player = next(self.players)
+            self.current_player = player
             self.mover.next_move(player, coordinates)
             self.reverse_mode_if_needed()
+            self.check_next_player_pass()
         except ValueError:
             self.repeat_player_move()
         except Exception as e:
@@ -37,10 +40,11 @@ class Game:
         if self.mode in self.REVERSING_MODES:
             self.reverse_game_state()
 
-    def check_player_pass(self):
-        player = self.get_current_player()
-        if not self.mover.board.has_moves(player.colour):
-            self.mover.pass_move(player)
+    def check_next_player_pass(self):
+        cur_player = self.current_player
+        next_player_colour = Board.get_colour_of_other_player(cur_player.colour)
+        if not self.mover.board.has_moves(next_player_colour):
+            self.mover.pass_move(next_player_colour)
             self.skip_player()
 
     def repeat_player_move(self):
@@ -86,24 +90,12 @@ class Game:
         else:
             self.game_state = s.States.human
 
-    def get_current_player(self):
-        current = next(self.players)
-        self.repeat_player_move()
-        return current
-
-    # @staticmethod
-    # def get_current_state_player(state):
-    #     return state[-1]
-
     @staticmethod
     def get_next_state(state, move_coordinates):
         board, player = deepcopy(state[0]), state[1]
         if move_coordinates is not None:
             board.make_move(move_coordinates, player)
         return (board, Board.get_colour_of_other_player(player))
-
-    # def get_current_state(self):
-    #     return (deepcopy(self.mover.board), self.get_current_player())
 
     def get_winner(self, board):
         white_count, black_count = self.count_cells(board)
@@ -116,8 +108,6 @@ class Game:
             return s.WHITE
         else:
             return s.BLACK
-
-
 
     @staticmethod
     def count_cells(board):

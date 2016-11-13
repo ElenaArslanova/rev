@@ -19,8 +19,8 @@ class Mover:
         self.next_possible_moves = self.get_possible_moves(
             Board.get_colour_of_other_player(player.colour))
 
-    def pass_move(self, player):
-        next_player_colour = Board.get_colour_of_other_player(player.colour)
+    def pass_move(self, player_colour):
+        next_player_colour = Board.get_colour_of_other_player(player_colour)
         self.next_possible_moves = self.get_possible_moves(next_player_colour)
 
     def get_possible_moves(self, player_colour):
