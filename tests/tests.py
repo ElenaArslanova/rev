@@ -101,37 +101,37 @@ class TestGame(unittest.TestCase):
     def test_get_next_state(self):
         game = Game(3, s.Modes.human_human, True)
         state = (game.mover.board, s.WHITE)
-        self.assertEquals(game.mover.board, state[0])
+        self.assertEqual(game.mover.board, state[0])
         next_state = game.get_next_state(state, (2, 1))
-        self.assertNotEquals(game.mover.board, next_state[0])
+        self.assertNotEqual(game.mover.board, next_state[0])
         game.mover.board.make_move((2, 1), s.WHITE)
-        self.assertEquals(game.mover.board, next_state[0])
+        self.assertEqual(game.mover.board, next_state[0])
 
     def test_skip_player(self):
         game = Game(4, s.Modes.human_human, True)
         game.next_move('c1')
-        self.assertEquals(game.current_player.colour, s.WHITE)
+        self.assertEqual(game.current_player.colour, s.WHITE)
         game.skip_player()
         game.next_move('a2')
-        self.assertEquals(game.current_player.colour, s.WHITE)
+        self.assertEqual(game.current_player.colour, s.WHITE)
 
     def test_repeat_player_move(self):
         game = Game(3, s.Modes.human_human, True)
         player = next(game.players)
-        self.assertEquals(player.colour, s.WHITE)
+        self.assertEqual(player.colour, s.WHITE)
         game.repeat_player_move()
-        self.assertEquals(next(game.players), player)
+        self.assertEqual(next(game.players), player)
 
     def test_move_is_repeated(self):
         game = Game(3, s.Modes.human_human, True)
         self.assertIsNone(game.current_player)
         game.next_move('b1')
         self.assertIsNotNone(game.current_player)
-        self.assertEquals(game.current_player.colour, s.WHITE)
+        self.assertEqual(game.current_player.colour, s.WHITE)
         game.next_move('a1')
-        self.assertEquals(game.current_player.colour, s.BLACK)
+        self.assertEqual(game.current_player.colour, s.BLACK)
         game.next_move('c3')
-        self.assertEquals(game.current_player.colour, s.BLACK)
+        self.assertEqual(game.current_player.colour, s.BLACK)
 
     @staticmethod
     def play_game_sequence(game, sequence):

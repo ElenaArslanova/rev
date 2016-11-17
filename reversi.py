@@ -42,8 +42,8 @@ class ReversiWindow(QMainWindow):
             image = self.images['black.png']
         elif cell.state == s.WHITE:
             image = self.images['white.png']
-        elif cell.get_coordinates() in self.game.mover.next_possible_moves:
-              # and self.game.game_state != s.States.ai):
+        elif (cell.get_coordinates() in self.game.mover.next_possible_moves
+              and self.game.game_state != s.States.ai):
             image = self.images['possible_move.png']
         else:
             image = self.images['empty.png']

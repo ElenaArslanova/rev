@@ -1,4 +1,5 @@
 from game.game import Game
+from settings import States
 import argparser
 
 def main():
@@ -8,11 +9,14 @@ def main():
                 is_console_game=True)
     game.mover.board.print()
     while not game.is_over():
-        player_input = input('Enter coordinates of your next move: ')
         try:
-            if len(player_input) != 2:
-                raise ValueError("Invalid coordinates")
-            game.next_move(player_input)
+            if game.game_state == States.human:
+                player_input = input('Enter coordinates of your next move: ')
+                if len(player_input) != 2:
+                    raise ValueError("Invalid coordinates")
+                game.next_move(player_input)
+            else:
+                game.next_move()
             print()
             game.mover.board.print()
         except ValueError as e:

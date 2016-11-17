@@ -1,5 +1,5 @@
 from settings import IMG_SIZE
-from game.mc import MC
+from game.montecarlo_ai import MonteCarloAI
 
 class Player:
     def __init__(self, colour):
@@ -30,9 +30,8 @@ class HumanPlayer(Player):
 class AIPlayer(Player):
     def __init__(self, colour, game):
         super().__init__(colour)
-        self.ai = MC(game, colour)
+        self.ai = MonteCarloAI(game, colour)
         self.game = game
 
     def next_move(self, coordinates):
-        # return choice(self.game.mover.board.get_moves(self.colour))
         return self.ai.get_move((self.game.mover.board, self.colour))

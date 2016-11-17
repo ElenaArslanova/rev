@@ -4,7 +4,7 @@ import time
 from math import log, sqrt
 from game import kit
 
-class MC:
+class MonteCarloAI:
     def __init__(self, game, colour, **kwargs):
         self.colour = colour
         self.game = game
@@ -12,8 +12,6 @@ class MC:
         self.state_node = {}
 
     def get_move(self, state):
-        # if not possible_moves:
-        #     return None
         state = deepcopy(state)
         move = self.monte_carlo_search(state)
         return move
@@ -34,9 +32,9 @@ class MC:
         start = time.time()
         while (time.time() - start < self.simulation_time
                and root.moves_left_to_expand > 0):
-            picked_node = self.tree_policy(root)
-            result = self.run_simulation(picked_node.state)
-            self.back_propagate(picked_node, result)
+            selected_node = self.select_node(root)
+            result = self.run_simulation(selected_node.state)
+            self.back_propagate(selected_node, result)
         for child in root.children:
             wins, plays = child.get_wins_and_plays()
             position = child.move
@@ -72,7 +70,7 @@ class MC:
         node.plays += 1
         node.wins += delta
 
-    def tree_policy(self, root):
+    def select_node(self, root):
         current_node = root
         while root.moves_left_to_expand > 0:
             possible_moves = current_node.state[0].get_moves(current_node.state[1])
@@ -93,6 +91,7 @@ class MC:
                              if move not in current_node.moves_expanded]
                 move = choice(to_expand)
                 state = self.game.get_next_state(current_node.state, move)
+                possible_moves = state[0].get_moves(state[1])
                 child = Node(state, move, len(possible_moves))
                 current_node.add_child(child)
                 self.state_node[state] = child
@@ -146,7 +145,7 @@ class Node:
         self.parent = None
         self.moves_expanded = set()
         self.moves_left_to_expand = children_amount
-        self.move = move # the move this state
+        self.move = move # the move that led to this state
 
     def propagate_completion(self):
         if self.parent is None:
