@@ -17,9 +17,12 @@
 
 ## **Консольная версия**
 Справка по запуску `./creversi.py --help`
+
 Пример запуска `./creversi.py -s 6 mode --human_human`
+
 Справка по режимам игры `./creversi.py mode --help`
 
 ## **Графическая версия**
 Справка по запуску `./reversi.py`
+
 Пример запуска `./reversi.py mode -ha`
