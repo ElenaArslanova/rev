@@ -2,12 +2,12 @@ from unittest import TestCase
 from random import choice
 from game.game import Game
 from game.montecarlo_ai import Node
-from settings import Modes, WHITE
+from settings import WHITE
 
 
 class TestNode(TestCase):
     def setUp(self):
-        self.game = Game(3, Modes.human_human, True)
+        self.game = Game(3, Game.Modes.human_human, True)
         first_move = (1, 2)
         first_state = Game.get_next_state((self.game.mover.board, WHITE),
                                                first_move)

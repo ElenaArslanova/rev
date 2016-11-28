@@ -6,6 +6,7 @@ def main():
     reversi_parser = argparser.create_parser()
     namespace = reversi_parser.parse_args()
     game = Game(namespace.size, mode=argparser.get_mode(namespace),
+                difficulty_level=argparser.get_difficulty_level(namespace),
                 is_console_game=True)
     game.mover.board.print()
     while not game.is_over():

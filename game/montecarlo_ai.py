@@ -5,9 +5,10 @@ from math import log, sqrt
 from game import kit
 
 class MonteCarloAI:
-    def __init__(self, game, colour, **kwargs):
+    def __init__(self, game, colour, difficulty_level, **kwargs):
         self.colour = colour
         self.game = game
+        self.difficulty_level = difficulty_level
         self.simulation_time = kwargs.get('time', 1)
         self.state_node = {}
 
@@ -108,7 +109,10 @@ class MonteCarloAI:
             if opponent_turn:
                 wins = plays - wins
             parent_plays = node.get_wins_and_plays()[1]
-            values[child] = self.get_ucb(wins, plays, parent_plays)
+            if self.difficulty_level == self.game.DifficultyLevels.normal:
+                values[child] = self.get_wins_plays_percentage(wins, plays)
+            else:
+                values[child] = self.get_ucb(wins, plays, parent_plays)
         best = max(values, key=values.get)
         return best
 
@@ -128,12 +132,15 @@ class MonteCarloAI:
                 state = (state[0], kit.Board.get_colour_of_other_player(state[1]))
                 moves = state[0].get_moves(state[1])
             picked_move = choice(moves)
-            # state = deepcopy(state[0]).make_move(picked_move, state[1])
             state = self.game.get_next_state(state, picked_move)
 
     @staticmethod
-    def get_ucb(wins, plays, parent_plays):
-        return (wins / plays) + sqrt(2 * log(parent_plays) / plays)
+    def get_wins_plays_percentage(wins, plays):
+        return wins / plays
+
+    def get_ucb(self, wins, plays, parent_plays):
+        return (self.get_wins_plays_percentage(wins, plays)
+                + sqrt(2 * log(parent_plays) / plays))
 
 
 class Node:

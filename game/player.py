@@ -1,4 +1,5 @@
 from settings import IMG_SIZE
+from random import choice
 from game.montecarlo_ai import MonteCarloAI
 
 class Player:
@@ -28,10 +29,20 @@ class HumanPlayer(Player):
         return self.board_size - int(y), ord(x) - ord('a')
 
 class AIPlayer(Player):
-    def __init__(self, colour, game):
+    def __init__(self, colour, game, difficulty_level):
         super().__init__(colour)
-        self.ai = MonteCarloAI(game, colour)
+        self.ai = MonteCarloAI(game, colour, difficulty_level)
         self.game = game
 
     def next_move(self, coordinates):
         return self.ai.get_move((self.game.mover.board, self.colour))
+
+
+class RandomAIPlayer(Player):
+    def __init__(self, colour, game):
+        super().__init__(colour)
+        self.colour = colour
+        self.game = game
+
+    def next_move(self, coordinates):
+        return choice(self.game.mover.board.get_moves(self.colour))

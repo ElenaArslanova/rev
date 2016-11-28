@@ -1,11 +1,12 @@
 import os
+import pickle
 import sys
 from contextlib import contextmanager
 
-from PyQt5.QtCore import QBasicTimer, QThread
-from PyQt5.QtGui import QPainter, QImage
+from PyQt5.QtCore import QBasicTimer, QThread, QPoint, Qt, QTimer
+from PyQt5.QtGui import QPainter, QImage, QIcon, QPixmap, QColor, QFont
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QDesktopWidget,
-                             QMessageBox)
+                             QMessageBox, QAction)
 
 import argparser
 import settings as s
@@ -13,23 +14,34 @@ from game.game import Game
 
 
 class ReversiWindow(QMainWindow):
-    def __init__(self, board_size, game_mode):
+    def __init__(self, board_size, game_mode, game_difficulty_level):
         super().__init__()
         self.images = {}
-        self.init_ui(board_size, game_mode)
+        self.init_ui(board_size, game_mode, game_difficulty_level)
 
 
-    def init_ui(self, board_size, game_mode):
-        self.game = Game(board_size, mode =game_mode, is_console_game=False)
+    def init_ui(self, board_size, game_mode, game_difficulty_level):
+        self.game = Game(board_size, mode=game_mode,
+                         difficulty_level=game_difficulty_level,
+                         is_console_game=False)
+        self.game_was_saved = False
+        self.time_for_move = 5
+        self.count = 5
         self.timer = QBasicTimer()
+        self.move_timer = QTimer()
         self.ai_thread = AIThread(self)
         self.ai_thread.finished.connect(self.update)
         self.load_images()
-        self.resize(board_size * s.IMG_SIZE, board_size * s.IMG_SIZE)
+        self.add_toolbar()
+        self.font_size = 12
+        self.resize(board_size * s.IMG_SIZE,
+                    board_size * s.IMG_SIZE + self.toolbar.height() + 10 + self.font_size)
         self.center()
         self.setWindowTitle('Reversi')
         self.show()
         self.timer.start(1, self)
+        self.move_timer.timeout.connect(self.count_down)
+        self.move_timer.start(1000)
 
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -37,23 +49,67 @@ class ReversiWindow(QMainWindow):
         self.move((screen.width() - size.width()) / 2,
                   (screen.height() - size.height()) / 2)
 
+    def add_toolbar(self):
+        self.toolbar = self.addToolBar('')
+        self.add_toolbar_action(self.toolbar, 'Save', 'save.png', self.save,
+                                'Ctrl+S')
+        self.add_toolbar_action(self.toolbar, 'Undo', 'undo.png', self.undo,
+                                'Ctrl+Z')
+        self.add_toolbar_action(self.toolbar, 'Redo', 'redo.png', self.redo)
+        self.toolbar.setMovable(False)
+
+    def add_toolbar_action(self, toolbar, name, image, function, shortcut=None):
+        action = QAction(QIcon(QPixmap(self.images[image])), name, self)
+        if not shortcut is None:
+            action.setShortcut(shortcut)
+        action.triggered.connect(function)
+        toolbar.addAction(action)
+
+    def save(self):
+        if self.game.game_state == Game.States.human:
+            with open('saved_game.pickle', 'wb') as f:
+                pickle.dump(self.game, f, protocol=pickle.HIGHEST_PROTOCOL)
+            self.game_was_saved = True
+
+    def undo(self):
+        if self.game.game_state == Game.States.human:
+            self.game.undo()
+
+    def redo(self):
+        if self.game.game_state == Game.States.human:
+            self.game.redo()
+
     def draw_cell(self, painter, cell):
         if cell.state == s.BLACK:
             image = self.images['black.png']
         elif cell.state == s.WHITE:
             image = self.images['white.png']
         elif (cell.get_coordinates() in self.game.mover.next_possible_moves
-              and self.game.game_state != s.States.ai):
+              and self.game.game_state != Game.States.ai):
             image = self.images['possible_move.png']
         else:
             image = self.images['empty.png']
-        painter.drawImage(cell.y*s.IMG_SIZE, cell.x*s.IMG_SIZE, image)
+        painter.drawImage(cell.y*s.IMG_SIZE,
+                          cell.x*s.IMG_SIZE + self.toolbar.height() + self.font_size,
+                          image)
 
+    def draw_text(self, painter, font_size):
+        painter.setPen(QColor(Qt.black))
+        painter.setFont(QFont('Decorative', font_size))
+        painter.drawText(QPoint(10, self.toolbar.height() + font_size),
+                         'Time left for move: {}'.format(self.count))
 
-    # def draw_text(self, painter):
-    #     painter.setPen(QColor(168, 34, 3))
-    #     painter.setFont(QFont('Decorative', 10))
-    #     painter.drawText(QPoint(s.SIZE * s.IMG_SIZE + 10, 50), self.game.get_current_player().colour)
+    def reset_count(self):
+        self.count = self.time_for_move
+
+    def count_down(self):
+        if self.count != 0:
+            self.count -= 1
+        else:
+
+            self.game.skip_player()
+            self.reset_count()
+
 
     def load_images(self):
         images_path = os.path.join(os.getcwd(), 'images')
@@ -61,8 +117,11 @@ class ReversiWindow(QMainWindow):
             self.images[image] = QImage(os.path.join(images_path, image))
 
     def mousePressEvent(self, QMouseEvent):
-        if self.game.game_state == s.States.human:
-            self.game.next_move(QMouseEvent.pos())
+        if self.game.game_state == Game.States.human:
+            position = QMouseEvent.pos()
+            position.setY(position.y() - self.toolbar.height() - self.font_size)
+            self.game.next_move(position)
+            self.reset_count()
             self.update()
 
     def timerEvent(self, event):
@@ -70,31 +129,57 @@ class ReversiWindow(QMainWindow):
             self.timer.stop()
             self.show_end_of_game_dialog()
         else:
-            if self.game.game_state == s.States.ai:
+            if self.game.game_state == Game.States.ai:
                 self.ai_thread.start()
+                self.reset_count()
         self.update()
 
     def paintEvent(self, event):
         with painter(self) as p:
-            # self.draw_text(p)
             for cell in self.game.mover.board.cells():
                 self.draw_cell(p, cell)
+            self.draw_text(p, self.font_size)
 
     def show_end_of_game_dialog(self):
         message_box = QMessageBox()
         message_box.setText('The game is over! {}'.format
                             (self.game.get_winner_message()))
-        message_box.setInformativeText('Do you want to play again?')
-        message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        self.check_answer(message_box.exec_())
+        message_box.exec_()
+        if self.game_was_saved:
+            self.ask_question('Do you want to play from your last saved position?',
+                              message_box)
+            self.check_answer(message_box.exec_(), self.load_saved_game,
+                              self.play_again_action)
+        else:
+            self.play_again_action()
 
-    def check_answer(self, clicked_button):
-        if clicked_button == QMessageBox.Yes:
-            self.game.restart()
+    def play_again_action(self):
+        message_box = QMessageBox()
+        message_box.setText('Do you want to play again?')
+        self.ask_question('', message_box)
+        self.check_answer(message_box.exec_(), self.restart,
+                                 self.close)
+
+    def restart(self):
+        self.game_was_saved = False
+        self.game.restart()
+        self.timer.start(1, self)
+
+    def load_saved_game(self):
+        with open('saved_game.pickle', 'rb') as f:
+            self.game = pickle.load(f)
             self.timer.start(1, self)
-            self.update()
+
+    def ask_question(self, question, message_box):
+        message_box.setInformativeText(question)
+        message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+    def check_answer(self, clicked_button, yes_action, no_action):
+        if clicked_button == QMessageBox.Yes:
+            yes_action()
         elif clicked_button == QMessageBox.No:
-            self.close()
+            no_action()
+        self.update()
 
 
 class AIThread(QThread):
@@ -118,7 +203,8 @@ def main():
     reversi_parser = argparser.create_parser()
     namespace = reversi_parser.parse_args()
     reversi_window = ReversiWindow(namespace.size,
-                                   argparser.get_mode(namespace))
+                                   argparser.get_mode(namespace),
+                                   argparser.get_difficulty_level(namespace))
     reversi_window.load_images()
     sys.exit(app.exec_())
 

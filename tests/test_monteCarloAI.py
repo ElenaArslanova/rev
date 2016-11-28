@@ -1,12 +1,12 @@
 from unittest import TestCase
 from game.game import Game
 from game.montecarlo_ai import MonteCarloAI, Node
-from settings import Modes, WHITE
+from settings import WHITE
 
 
 class TestMonteCarloAI(TestCase):
     def setUp(self):
-        self.game = Game(3, Modes.human_human, True)
+        self.game = Game(3, Game.Modes.human_human, True)
         self.ai = MonteCarloAI(self.game, WHITE)
         first_move = (1, 2)
         first_state = Game.get_next_state((self.game.mover.board, WHITE),

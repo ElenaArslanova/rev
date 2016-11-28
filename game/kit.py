@@ -3,7 +3,6 @@ import settings as s
 class Cell:
     def __init__(self, x, y):
         self.state = s.EMPTY
-        #self.flipped = False
         self.can_be_taken = False
         self.x = x
         self.y = y
@@ -13,6 +12,9 @@ class Cell:
 
     def set_white(self):
         self.state = s.WHITE
+
+    def set_empty(self):
+        self.state = s.EMPTY
 
     def get_state(self):
         return self.state
@@ -42,11 +44,15 @@ class Cell:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash((self.x, self.y))
+
 
 class Board:
     def __init__(self, size):
         self.size = size
         self.board = []
+        self.move_flipped_cells = {}
         for x in range(self.size):
             self.board.append([])
             for y in range(self.size):
@@ -106,6 +112,7 @@ class Board:
             current_cell.set_white()
         else:
             current_cell.set_black()
+        all_flips = []
         for direction in s.DIRECTIONS:
             start = self.get_next_move_in_direction(x, y, direction)
             if start is None:
@@ -128,6 +135,9 @@ class Board:
             if not cancel_flipping:
                 for cell_to_flip in flip:
                     cell_to_flip.flip()
+                all_flips.extend(flip)
+        if not coordinates in self.move_flipped_cells:
+            self.move_flipped_cells[coordinates] = all_flips
         self.cell_count += 1
 
     @staticmethod
@@ -172,6 +182,19 @@ class Board:
         for x in range(self.size):
             for cell in self.board[x]:
                 yield cell
+
+    def count_cells(self):
+        white_count = 0
+        black_count = 0
+        for cell in self.cells():
+            if cell.state == s.WHITE:
+                white_count += 1
+            elif cell.state == s.BLACK:
+                black_count += 1
+        return (white_count, black_count)
+
+    def update_cell_count(self):
+        self.cell_count = sum(self.count_cells())
 
     def __hash__(self):
         board_string = ''.join(cell.state for row in self.board

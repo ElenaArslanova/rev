@@ -1,9 +1,11 @@
 import argparse
-from settings import Modes
+from game.game import Game
 
 def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--size', type=int, default=8, help='Размер доски')
+    parser.add_argument('-l', '--level', choices=['easy', 'normal', 'hard'],
+                        help='Уровень сложности', required=True)
     subparsers = parser.add_subparsers(dest='mode', help='Режим игры')
     subparsers.required = True
     mode_parser = subparsers.add_parser('mode')
@@ -19,10 +21,18 @@ def create_parser():
 
 def get_mode(namespace):
     if namespace.ai_ai:
-        return Modes.ai_ai
+        return Game.Modes.ai_ai
     elif namespace.ai_human:
-        return Modes.ai_human
+        return Game.Modes.ai_human
     elif namespace.human_ai:
-        return Modes.human_ai
+        return Game.Modes.human_ai
     else:
-        return Modes.human_human
+        return Game.Modes.human_human
+
+def get_difficulty_level(namespace):
+    if namespace.level == 'easy':
+        return Game.DifficultyLevels.easy
+    elif namespace.level == 'normal':
+        return Game.DifficultyLevels.normal
+    else:
+        return Game.DifficultyLevels.hard
