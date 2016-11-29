@@ -28,10 +28,11 @@ class HumanPlayer(Player):
         x, y = coordinates[0], coordinates[1]
         return self.board_size - int(y), ord(x) - ord('a')
 
+
 class AIPlayer(Player):
-    def __init__(self, colour, game, difficulty_level):
+    def __init__(self, colour, game, difficulty_level, time_for_move):
         super().__init__(colour)
-        self.ai = MonteCarloAI(game, colour, difficulty_level)
+        self.ai = MonteCarloAI(game, colour, difficulty_level, time=time_for_move)
         self.game = game
 
     def next_move(self, coordinates):

@@ -14,16 +14,15 @@ from game.game import Game
 
 
 class ReversiWindow(QMainWindow):
-    def __init__(self, board_size, game_mode, game_difficulty_level):
+    def __init__(self, board_size, game_mode, game_difficulty_level, game_time_for_move):
         super().__init__()
         self.images = {}
-        self.init_ui(board_size, game_mode, game_difficulty_level)
+        self.init_ui(board_size, game_mode, game_difficulty_level, game_time_for_move)
 
-
-    def init_ui(self, board_size, game_mode, game_difficulty_level):
+    def init_ui(self, board_size, game_mode, game_difficulty_level, game_time_for_move):
         self.game = Game(board_size, mode=game_mode,
                          difficulty_level=game_difficulty_level,
-                         is_console_game=False)
+                         is_console_game=False, time_for_move=game_time_for_move)
         self.game_was_saved = False
         self.time_for_move = 5
         self.count = 5
@@ -73,10 +72,12 @@ class ReversiWindow(QMainWindow):
 
     def undo(self):
         if self.game.game_state == Game.States.human:
+            self.reset_count()
             self.game.undo()
 
     def redo(self):
         if self.game.game_state == Game.States.human:
+            self.reset_count()
             self.game.redo()
 
     def draw_cell(self, painter, cell):
@@ -106,10 +107,9 @@ class ReversiWindow(QMainWindow):
         if self.count != 0:
             self.count -= 1
         else:
-
-            self.game.skip_player()
+            self.game.pass_move()
             self.reset_count()
-
+            self.update()
 
     def load_images(self):
         images_path = os.path.join(os.getcwd(), 'images')
@@ -131,7 +131,6 @@ class ReversiWindow(QMainWindow):
         else:
             if self.game.game_state == Game.States.ai:
                 self.ai_thread.start()
-                self.reset_count()
         self.update()
 
     def paintEvent(self, event):
@@ -158,7 +157,7 @@ class ReversiWindow(QMainWindow):
         message_box.setText('Do you want to play again?')
         self.ask_question('', message_box)
         self.check_answer(message_box.exec_(), self.restart,
-                                 self.close)
+                          self.close)
 
     def restart(self):
         self.game_was_saved = False
@@ -189,6 +188,7 @@ class AIThread(QThread):
 
     def run(self):
         self.app.game.next_move()
+        self.app.reset_count()
 
 
 @contextmanager
@@ -198,13 +198,14 @@ def painter(pix):
     yield painter
     painter.end()
 
+
 def main():
     app = QApplication(sys.argv)
     reversi_parser = argparser.create_parser()
     namespace = reversi_parser.parse_args()
     reversi_window = ReversiWindow(namespace.size,
                                    argparser.get_mode(namespace),
-                                   argparser.get_difficulty_level(namespace))
+                                   argparser.get_difficulty_level(namespace), namespace.time)
     reversi_window.load_images()
     sys.exit(app.exec_())
 

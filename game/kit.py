@@ -136,7 +136,7 @@ class Board:
                 for cell_to_flip in flip:
                     cell_to_flip.flip()
                 all_flips.extend(flip)
-        if not coordinates in self.move_flipped_cells:
+        if coordinates not in self.move_flipped_cells:
             self.move_flipped_cells[coordinates] = all_flips
         self.cell_count += 1
 
@@ -191,14 +191,14 @@ class Board:
                 white_count += 1
             elif cell.state == s.BLACK:
                 black_count += 1
-        return (white_count, black_count)
+        return white_count, black_count
 
     def update_cell_count(self):
         self.cell_count = sum(self.count_cells())
 
     def __hash__(self):
         board_string = ''.join(cell.state for row in self.board
-                                for cell in row)
+                               for cell in row)
         return hash(board_string)
 
     def __eq__(self, other):

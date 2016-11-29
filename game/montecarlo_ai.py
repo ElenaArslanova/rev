@@ -4,6 +4,7 @@ import time
 from math import log, sqrt
 from game import kit
 
+
 class MonteCarloAI:
     def __init__(self, game, colour, difficulty_level, **kwargs):
         self.colour = colour
@@ -59,6 +60,8 @@ class MonteCarloAI:
                     best_moves = [child.move]
                 elif wins == best_wins:
                     best_moves.append(child.move)
+        if not best_moves:
+            raise ValueError()
         return choice(best_moves)
 
     @staticmethod

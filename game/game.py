@@ -19,14 +19,16 @@ class Game:
                             module=__name__, qualname='Game.DifficultyLevels')
     REVERSING_MODES = (Modes.human_ai, Modes.ai_human)
 
-    def __init__(self, board_size, mode, difficulty_level, is_console_game):
+    def __init__(self, board_size, mode, difficulty_level, is_console_game, time_for_move):
         self.mode = mode
         self.board_size = board_size
         self.difficulty_level = difficulty_level
+        self.time_for_move = time_for_move
         self.is_console = is_console_game
         self.mover = Mover(board_size)
         self.players = self.get_players()
         self.current_player = None
+        self.same_player_passing = False
 
     def is_over(self):
         return (self.mover.board.cell_count == self.mover.board.size ** 2 or
@@ -40,7 +42,12 @@ class Game:
             self.reverse_mode_if_needed()
             self.check_next_player_pass()
         except ValueError:
-            self.repeat_player_move()
+            if not self.mover.board.has_moves(self.current_player.colour):
+                self.same_player_passing = True
+                next(self.players)
+                self.pass_move()
+            else:
+                self.repeat_player_move()
 
     def reverse_mode_if_needed(self):
         if self.mode in self.REVERSING_MODES:
@@ -60,9 +67,15 @@ class Game:
         self.reverse_mode_if_needed()
 
     def pass_move(self):
-        next_player_colour = Board.get_colour_of_other_player(
-            self.current_player.colour)
-        self.mover.pass_move(next_player_colour)
+        if self.current_player is None:
+            player_colour = Board.get_colour_of_other_player(s.FIRST)
+        else:
+            player_colour = self.current_player.colour
+        if self.same_player_passing:
+            self.mover.pass_move(player_colour)
+            self.same_player_passing = False
+        else:
+            self.mover.pass_move(Board.get_colour_of_other_player(player_colour))
         self.skip_player()
 
     def get_winner_message(self):
@@ -83,8 +96,8 @@ class Game:
             first_ai_player = RandomAIPlayer(first, self)
             second_ai_player = RandomAIPlayer(second, self)
         else:
-            first_ai_player = AIPlayer(first, self, self.difficulty_level)
-            second_ai_player = AIPlayer(second, self, self.difficulty_level)
+            first_ai_player = AIPlayer(first, self, self.difficulty_level, time_for_move=self.time_for_move)
+            second_ai_player = AIPlayer(second, self, self.difficulty_level, time_for_move=self.time_for_move)
         if self.mode == self.Modes.human_human:
             self.game_state = self.States.human
             players = cycle((first_human_player, second_human_player))
@@ -110,7 +123,7 @@ class Game:
         board, player = deepcopy(state[0]), state[1]
         if move_coordinates is not None:
             board.make_move(move_coordinates, player)
-        return (board, Board.get_colour_of_other_player(player))
+        return board, Board.get_colour_of_other_player(player)
 
     @staticmethod
     def get_previous_state(state, last_move_coordinates):
@@ -119,7 +132,7 @@ class Game:
         for cell in flipped_cells:
             cell.flip()
         board.board[last_move_coordinates[0]][last_move_coordinates[1]].set_empty()
-        return (board, Board.get_colour_of_other_player(player))
+        return board, Board.get_colour_of_other_player(player)
 
     def get_current_state(self):
         return (deepcopy(self.mover.board),
