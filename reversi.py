@@ -32,7 +32,7 @@ class ReversiWindow(QMainWindow):
         self.ai_thread.finished.connect(self.update)
         self.load_images()
         self.add_toolbar()
-        self.font_size = 12
+        self.font_size = 10
         self.resize(board_size * s.IMG_SIZE,
                     board_size * s.IMG_SIZE + self.toolbar.height() + 10 + self.font_size)
         self.center()
@@ -121,12 +121,14 @@ class ReversiWindow(QMainWindow):
             position = QMouseEvent.pos()
             position.setY(position.y() - self.toolbar.height() - self.font_size)
             self.game.next_move(position)
+            # if self.game.game_state == Game.States.ai:
             self.reset_count()
             self.update()
 
     def timerEvent(self, event):
         if self.game.is_over():
             self.timer.stop()
+            self.move_timer.stop()
             self.show_end_of_game_dialog()
         else:
             if self.game.game_state == Game.States.ai:
