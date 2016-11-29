@@ -117,6 +117,7 @@ class Game:
             self.game_state = self.States.ai
         else:
             self.game_state = self.States.human
+        print('state reversed to {}'.format(self.game_state))
 
     @staticmethod
     def get_next_state(state, move_coordinates):

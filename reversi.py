@@ -24,12 +24,13 @@ class ReversiWindow(QMainWindow):
                          difficulty_level=game_difficulty_level,
                          is_console_game=False, time_for_move=game_time_for_move)
         self.game_was_saved = False
-        self.time_for_move = 5
-        self.count = 5
+        self.time_for_move = game_time_for_move
+        self.count = self.time_for_move
         self.timer = QBasicTimer()
         self.move_timer = QTimer()
         self.ai_thread = AIThread(self)
         self.ai_thread.finished.connect(self.update)
+        self.ai_is_running = False
         self.load_images()
         self.add_toolbar()
         self.font_size = 10
@@ -101,7 +102,9 @@ class ReversiWindow(QMainWindow):
                          'Time left for move: {}'.format(self.count))
 
     def reset_count(self):
-        self.count = self.time_for_move
+            print('resetting count')
+            print()
+            self.count = self.time_for_move
 
     def count_down(self):
         if self.count != 0:
@@ -121,8 +124,8 @@ class ReversiWindow(QMainWindow):
             position = QMouseEvent.pos()
             position.setY(position.y() - self.toolbar.height() - self.font_size)
             self.game.next_move(position)
-            # if self.game.game_state == Game.States.ai:
-            self.reset_count()
+            if self.game.game_state == Game.States.ai:
+                self.reset_count()
             self.update()
 
     def timerEvent(self, event):
@@ -132,7 +135,11 @@ class ReversiWindow(QMainWindow):
             self.show_end_of_game_dialog()
         else:
             if self.game.game_state == Game.States.ai:
-                self.ai_thread.start()
+                if not self.ai_is_running:
+                    self.ai_is_running = True
+                    print('ai will make a move')
+                    self.ai_thread.start()
+                    self.app.ai_is_running = False
         self.update()
 
     def paintEvent(self, event):
@@ -165,6 +172,7 @@ class ReversiWindow(QMainWindow):
         self.game_was_saved = False
         self.game.restart()
         self.timer.start(1, self)
+        self.move_timer.start(1000)
 
     def load_saved_game(self):
         with open('saved_game.pickle', 'rb') as f:
@@ -189,7 +197,9 @@ class AIThread(QThread):
         self.app = app
 
     def run(self):
+        print('ai run')
         self.app.game.next_move()
+        print('ai made move')
         self.app.reset_count()
 
 
