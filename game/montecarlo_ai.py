@@ -33,10 +33,10 @@ class MonteCarloAI:
         root.parent = None
         start = time.time()
         while time.time() - start < self.simulation_time and root.moves_left_to_expand > 0:
-            print('searching')
-            selected_node = self.select_node(root)
+            selected_node = self.select_node(root, start)
             result = self.run_simulation(selected_node.state)
             self.back_propagate(selected_node, result)
+            print(time.time() - start)
         print('time is up')
         for child in root.children:
             wins, plays = child.get_wins_and_plays()
@@ -77,10 +77,12 @@ class MonteCarloAI:
         node.plays += 1
         node.wins += delta
 
-    def select_node(self, root):
+    def select_node(self, root, start_time):
         current_node = root
-        while root.moves_left_to_expand > 0:
+        while (time.time() - start_time < self.simulation_time and
+               root.moves_left_to_expand > 0):
             possible_moves = current_node.state[0].get_moves(current_node.state[1])
+            print(possible_moves)
             if not possible_moves:
                 if self.game.get_winner(current_node.state[0]) == current_node.state[1]:
                     current_node.propagate_completion()
