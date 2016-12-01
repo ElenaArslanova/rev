@@ -29,8 +29,8 @@ class ReversiWindow(QMainWindow):
         self.timer = QBasicTimer()
         self.move_timer = QTimer()
         self.ai_thread = AIThread(self)
-        self.ai_thread.finished.connect(self.update)
-        self.ai_is_running = False
+        self.ai_thread.finished.connect(self.ai_finish)
+        self.ai_finished = True
         self.load_images()
         self.add_toolbar()
         self.font_size = 10
@@ -102,17 +102,31 @@ class ReversiWindow(QMainWindow):
                          'Time left for move: {}'.format(self.count))
 
     def reset_count(self):
-            print('resetting count')
-            print()
-            self.count = self.time_for_move
+            if not self.ai_thread.isRunning():
+                print('resetting count')
+                print()
+                self.count = self.time_for_move
+            else:
+                print('trying reset count')
 
     def count_down(self):
+        print('count: {}'.format(self.count))
         if self.count != 0:
             self.count -= 1
         else:
-            self.game.pass_move()
-            self.reset_count()
-            self.update()
+            if not self.ai_thread.isRunning():
+                self.game.pass_move()
+                self.reset_count()
+                self.update()
+            else:
+                print('zero but ai is running')
+
+    def ai_finish(self):
+        print('ai finished')
+        self.update()
+        self.reset_count()
+        self.ai_finished = True
+        # pass move?
 
     def load_images(self):
         images_path = os.path.join(os.getcwd(), 'images')
@@ -134,12 +148,10 @@ class ReversiWindow(QMainWindow):
             self.move_timer.stop()
             self.show_end_of_game_dialog()
         else:
-            if self.game.game_state == Game.States.ai:
-                if not self.ai_is_running:
-                    self.ai_is_running = True
-                    print('ai will make a move')
-                    self.ai_thread.start()
-                    self.app.ai_is_running = False
+            if self.game.game_state == Game.States.ai and self.ai_finished:
+                print('ai will make a move')
+                self.ai_finished = False
+                self.ai_thread.start()
         self.update()
 
     def paintEvent(self, event):
@@ -200,7 +212,7 @@ class AIThread(QThread):
         print('ai run')
         self.app.game.next_move()
         print('ai made move')
-        self.app.reset_count()
+        # self.app.reset_count()
 
 
 @contextmanager

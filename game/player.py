@@ -2,12 +2,14 @@ from settings import IMG_SIZE
 from random import choice
 from game.montecarlo_ai import MonteCarloAI
 
+
 class Player:
     def __init__(self, colour):
         self.colour = colour
 
     def next_move(self, coordinates):
         pass
+
 
 class HumanPlayer(Player):
     def __init__(self, colour, board_size, is_console):
