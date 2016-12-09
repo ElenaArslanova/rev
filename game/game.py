@@ -37,22 +37,14 @@ class Game:
     def next_move(self, coordinates=None):
         try:
             player = next(self.players)
-            print(player)
             self.current_player = player
             self.mover.next_move(player, coordinates)
             self.reverse_mode_if_needed()
             self.check_next_player_pass()
         except ValueError as e:
-            print(e)
             if self.game_state == self.States.ai:
                 self.ai_player_passing = True
                 self.pass_move()
-            # if not self.mover.board.has_moves(self.current_player.colour):  # надо ли это все вообще, next_player_pass же что-то проверяет
-            #     self.same_player_passing = True
-            #     next(self.players)
-            #     self.pass_move()
-            # else:
-            print('repeat move')
             self.repeat_player_move()
 
     def reverse_mode_if_needed(self):
@@ -77,11 +69,6 @@ class Game:
             player_colour = Board.get_colour_of_other_player(s.FIRST)
         else:
             player_colour = self.current_player.colour
-        # if self.same_player_passing:
-        #     self.mover.pass_move(Board.get_colour_of_other_player(player_colour))
-        #     self.same_player_passing = False
-        # else:
-        #     self.mover.pass_move(player_colour)
         if self.ai_player_passing:
             self.mover.pass_move(player_colour)
             self.ai_player_passing = False
@@ -128,7 +115,6 @@ class Game:
             self.game_state = self.States.ai
         else:
             self.game_state = self.States.human
-        print('state reversed to {}'.format(self.game_state))
 
     @staticmethod
     def get_next_state(state, move_coordinates):

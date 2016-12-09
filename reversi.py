@@ -103,14 +103,9 @@ class ReversiWindow(QMainWindow):
 
     def reset_count(self):
             if not self.ai_thread.isRunning():
-                print('resetting count')
-                print()
                 self.count = self.time_for_move
-            else:
-                print('trying reset count')
 
     def count_down(self):
-        print('count: {}'.format(self.count))
         if self.count != 0:
             self.count -= 1
         else:
@@ -118,15 +113,11 @@ class ReversiWindow(QMainWindow):
                 self.game.pass_move()
                 self.reset_count()
                 self.update()
-            else:
-                print('zero but ai is running')
 
     def ai_finish(self):
-        print('ai finished')
         self.update()
         self.reset_count()
         self.ai_finished = True
-        # pass move?
 
     def load_images(self):
         images_path = os.path.join(os.getcwd(), 'images')
@@ -149,7 +140,6 @@ class ReversiWindow(QMainWindow):
             self.show_end_of_game_dialog()
         else:
             if self.game.game_state == Game.States.ai and self.ai_finished:
-                print('ai will make a move')
                 self.ai_finished = False
                 self.ai_thread.start()
         self.update()
@@ -209,10 +199,7 @@ class AIThread(QThread):
         self.app = app
 
     def run(self):
-        print('ai run')
         self.app.game.next_move()
-        print('ai made move')
-        # self.app.reset_count()
 
 
 @contextmanager

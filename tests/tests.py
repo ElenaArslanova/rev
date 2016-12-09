@@ -73,7 +73,8 @@ class TestCell(unittest.TestCase):
 
 class TestGame(unittest.TestCase):
     def test_white_win(self):
-        game = Game(4, Game.Modes.human_human, True)
+        game = Game(4, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         self.assertTrue(not game.is_over())
         self.play_game_sequence(game, ['d2', 'd3', 'd4', 'b1', 'a3', 'b4',
                                        'a4', 'a2', 'c4'])
@@ -81,26 +82,31 @@ class TestGame(unittest.TestCase):
         self.assertEqual(game.WHITE_MSG, game.get_winner_message())
 
     def test_black_win(self):
-        game = Game(3, Game.Modes.human_human, True)
+        game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         self.assertTrue(not game.is_over())
         self.play_game_sequence(game, ['b1', 'a1', 'c3', 'c1'])
         self.assertTrue(game.is_over())
         self.assertEqual(game.BLACK_MSG, game.get_winner_message())
 
     def test_tie(self):
-        game = Game(2, Game.Modes.human_human, True)
+        game = Game(2, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         self.assertTrue(game.is_over())
         self.assertEqual(game.TIE_MSG, game.get_winner_message())
 
     def test_game_is_over(self):
-        game1 = Game(3, Game.Modes.human_human, True)
+        game1 = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                     True, 5)
         self.play_game_sequence(game1, ['b1', 'a1', 'c1', 'c3'])
         self.assertTrue(game1.is_over())
-        game2 = Game(2, Game.Modes.human_human, True)
+        game2 = Game(2, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                     True, 5)
         self.assertTrue(game2.is_over())
 
     def test_get_next_state(self):
-        game = Game(3, Game.Modes.human_human, True)
+        game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         state = (game.mover.board, s.WHITE)
         self.assertEqual(game.mover.board, state[0])
         next_state = game.get_next_state(state, (2, 1))
@@ -109,7 +115,8 @@ class TestGame(unittest.TestCase):
         self.assertEqual(game.mover.board, next_state[0])
 
     def test_get_previous_state(self):
-        game = Game(4, Game.Modes.human_human, True)
+        game = Game(4, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         state = (game.mover.board, s.WHITE)
         my_state = game.get_next_state(state, (1, 0))
         game.next_move('a3')
@@ -121,7 +128,8 @@ class TestGame(unittest.TestCase):
         self.assertEqual(my_state, my_prev_state)
 
     def test_skip_player(self):
-        game = Game(4, Game.Modes.human_human, True)
+        game = Game(4, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         game.next_move('c1')
         self.assertEqual(game.current_player.colour, s.WHITE)
         game.skip_player()
@@ -129,14 +137,16 @@ class TestGame(unittest.TestCase):
         self.assertEqual(game.current_player.colour, s.WHITE)
 
     def test_repeat_player_move(self):
-        game = Game(3, Game.Modes.human_human, True)
+        game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         player = next(game.players)
         self.assertEqual(player.colour, s.WHITE)
         game.repeat_player_move()
         self.assertEqual(next(game.players), player)
 
     def test_move_is_repeated(self):
-        game = Game(3, Game.Modes.human_human, True)
+        game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         self.assertIsNone(game.current_player)
         game.next_move('b1')
         self.assertIsNotNone(game.current_player)
@@ -147,7 +157,8 @@ class TestGame(unittest.TestCase):
         self.assertEqual(game.current_player.colour, s.BLACK)
 
     def test_undo_redo(self):
-        game = Game(4, Game.Modes.human_human, True)
+        game = Game(4, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                    True, 5)
         initial_state = (deepcopy(game.mover.board), s.WHITE)
         game.next_move('a3')
         game.next_move('a2')

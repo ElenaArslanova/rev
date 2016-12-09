@@ -36,13 +36,10 @@ class MonteCarloAI:
             selected_node = self.select_node(root, start)
             result = self.run_simulation(selected_node.state)
             self.back_propagate(selected_node, result)
-            print(time.time() - start)
-        print('time is up')
         for child in root.children:
             wins, plays = child.get_wins_and_plays()
             position = child.move
             results[position] = (wins, plays)
-        print('end of search')
         return self.get_best_move(root)
 
     @staticmethod
@@ -62,7 +59,6 @@ class MonteCarloAI:
                     best_moves = [child.move]
                 elif wins == best_wins:
                     best_moves.append(child.move)
-        print('best moves for ai: {}'.format(best_moves))
         if not any(best_moves):
             raise ValueError()
         return choice(best_moves)
@@ -82,7 +78,6 @@ class MonteCarloAI:
         while (time.time() - start_time < self.simulation_time and
                root.moves_left_to_expand > 0):
             possible_moves = current_node.state[0].get_moves(current_node.state[1])
-            print(possible_moves)
             if not possible_moves:
                 if self.game.get_winner(current_node.state[0]) == current_node.state[1]:
                     current_node.propagate_completion()

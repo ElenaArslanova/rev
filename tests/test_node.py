@@ -7,7 +7,8 @@ from settings import WHITE
 
 class TestNode(TestCase):
     def setUp(self):
-        self.game = Game(3, Game.Modes.human_human, True)
+        self.game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
+                         True, 5)
         first_move = (1, 2)
         first_state = Game.get_next_state((self.game.mover.board, WHITE),
                                                first_move)

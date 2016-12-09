@@ -6,8 +6,9 @@ from settings import WHITE
 
 class TestMonteCarloAI(TestCase):
     def setUp(self):
-        self.game = Game(3, Game.Modes.human_human, True)
-        self.ai = MonteCarloAI(self.game, WHITE)
+        self.game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.hard,
+                         True, 5)
+        self.ai = MonteCarloAI(self.game, WHITE, Game.DifficultyLevels.hard)
         first_move = (1, 2)
         first_state = Game.get_next_state((self.game.mover.board, WHITE),
                                           first_move)
