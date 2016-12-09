@@ -34,7 +34,8 @@ class HumanPlayer(Player):
 class AIPlayer(Player):
     def __init__(self, colour, game, difficulty_level, time_for_move):
         super().__init__(colour)
-        self.ai = MonteCarloAI(game, colour, difficulty_level, time=time_for_move)
+        self.ai = MonteCarloAI(game, colour, difficulty_level,
+                               time=time_for_move)
         self.game = game
 
     def next_move(self, coordinates):

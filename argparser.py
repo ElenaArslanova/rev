@@ -3,10 +3,12 @@ from game.game import Game
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '--size', type=int, default=8, help='Размер доски')
+    parser.add_argument('-s', '--size', type=positive, default=8,
+                        help='Размер доски')
     parser.add_argument('-l', '--level', choices=['easy', 'normal', 'hard'],
                         help='Уровень сложности', required=True)
-    parser.add_argument('-t', '--time', type=int, default=5, help='Время на ход')
+    parser.add_argument('-t', '--time', type=positive, default=5,
+                        help='Время на ход')
     subparsers = parser.add_subparsers(dest='mode', help='Режим игры')
     subparsers.required = True
     mode_parser = subparsers.add_parser('mode')
@@ -19,6 +21,13 @@ def create_parser():
     mode_parser.add_argument('-aa', '--ai_ai', action = 'store_true',
             help='Искусственный интеллект против искусственного интеллекта')
     return parser
+
+def positive(value):
+    int_value = int(value)
+    if int_value <= 0:
+        raise argparse.ArgumentTypeError('%s is invalid positive int value' %
+                                         value)
+    return int_value
 
 def get_mode(namespace):
     if namespace.ai_ai:

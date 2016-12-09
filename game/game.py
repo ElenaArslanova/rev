@@ -12,14 +12,15 @@ class Game:
     WHITE_MSG = 'White won!'
     BLACK_MSG = 'Black won!'
     Modes = Enum('Modes', 'human_human human_ai ai_human ai_ai',
-                 module = __name__, qualname='Game.Modes')
+                 module=__name__, qualname='Game.Modes')
     States = Enum('GameStates', 'human ai', module = __name__,
                   qualname='Game.States')
     DifficultyLevels = Enum('DifficultyLevels', 'easy normal hard',
                             module=__name__, qualname='Game.DifficultyLevels')
     REVERSING_MODES = (Modes.human_ai, Modes.ai_human)
 
-    def __init__(self, board_size, mode, difficulty_level, is_console_game, time_for_move):
+    def __init__(self, board_size, mode, difficulty_level, is_console_game,
+                 time_for_move):
         self.mode = mode
         self.board_size = board_size
         self.difficulty_level = difficulty_level
@@ -41,7 +42,7 @@ class Game:
             self.mover.next_move(player, coordinates)
             self.reverse_mode_if_needed()
             self.check_next_player_pass()
-        except ValueError as e:
+        except ValueError:
             if self.game_state == self.States.ai:
                 self.ai_player_passing = True
                 self.pass_move()
@@ -88,14 +89,18 @@ class Game:
     def get_players(self):
         first = s.FIRST
         second = Board.get_colour_of_other_player(first)
-        first_human_player = HumanPlayer(first, self.board_size, self.is_console)
-        second_human_player = HumanPlayer(second, self.board_size, self.is_console)
+        first_human_player = HumanPlayer(first, self.board_size,
+                                         self.is_console)
+        second_human_player = HumanPlayer(second, self.board_size,
+                                          self.is_console)
         if self.difficulty_level == self.DifficultyLevels.easy:
             first_ai_player = RandomAIPlayer(first, self)
             second_ai_player = RandomAIPlayer(second, self)
         else:
-            first_ai_player = AIPlayer(first, self, self.difficulty_level, time_for_move=self.time_for_move-1)
-            second_ai_player = AIPlayer(second, self, self.difficulty_level, time_for_move=self.time_for_move-1)
+            first_ai_player = AIPlayer(first, self, self.difficulty_level,
+                                       time_for_move=self.time_for_move-1)
+            second_ai_player = AIPlayer(second, self, self.difficulty_level,
+                                        time_for_move=self.time_for_move-1)
         if self.mode == self.Modes.human_human:
             self.game_state = self.States.human
             players = cycle((first_human_player, second_human_player))
@@ -159,7 +164,8 @@ class Game:
         opponent_previous_state = self.get_previous_state(self.get_current_state(),
                                                  opponent_last_move)
         last_move = self.mover.move_back()
-        previous_state = self.get_previous_state(opponent_previous_state, last_move)
+        previous_state = self.get_previous_state(opponent_previous_state,
+                                                 last_move)
         self.mover.update_board(previous_state[0],
                         Board.get_colour_of_other_player(previous_state[1]))
 

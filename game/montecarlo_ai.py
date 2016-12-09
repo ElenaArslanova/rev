@@ -32,7 +32,8 @@ class MonteCarloAI:
 
         root.parent = None
         start = time.time()
-        while time.time() - start < self.simulation_time and root.moves_left_to_expand > 0:
+        while (time.time() - start < self.simulation_time
+               and root.moves_left_to_expand > 0):
             selected_node = self.select_node(root, start)
             result = self.run_simulation(selected_node.state)
             self.back_propagate(selected_node, result)

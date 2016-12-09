@@ -14,15 +14,19 @@ from game.game import Game
 
 
 class ReversiWindow(QMainWindow):
-    def __init__(self, board_size, game_mode, game_difficulty_level, game_time_for_move):
+    def __init__(self, board_size, game_mode, game_difficulty_level,
+                 game_time_for_move):
         super().__init__()
         self.images = {}
-        self.init_ui(board_size, game_mode, game_difficulty_level, game_time_for_move)
+        self.init_ui(board_size, game_mode, game_difficulty_level,
+                     game_time_for_move)
 
-    def init_ui(self, board_size, game_mode, game_difficulty_level, game_time_for_move):
+    def init_ui(self, board_size, game_mode, game_difficulty_level,
+                game_time_for_move):
         self.game = Game(board_size, mode=game_mode,
                          difficulty_level=game_difficulty_level,
-                         is_console_game=False, time_for_move=game_time_for_move)
+                         is_console_game=False,
+                         time_for_move=game_time_for_move)
         self.game_was_saved = False
         self.time_for_move = game_time_for_move
         self.count = self.time_for_move
@@ -35,7 +39,8 @@ class ReversiWindow(QMainWindow):
         self.add_toolbar()
         self.font_size = 10
         self.resize(board_size * s.IMG_SIZE,
-                    board_size * s.IMG_SIZE + self.toolbar.height() + 10 + self.font_size)
+                    (board_size * s.IMG_SIZE + self.toolbar.height() + 10 +
+                     self.font_size))
         self.center()
         self.setWindowTitle('Reversi')
         self.show()
@@ -58,9 +63,10 @@ class ReversiWindow(QMainWindow):
         self.add_toolbar_action(self.toolbar, 'Redo', 'redo.png', self.redo)
         self.toolbar.setMovable(False)
 
-    def add_toolbar_action(self, toolbar, name, image, function, shortcut=None):
+    def add_toolbar_action(self, toolbar, name, image, function,
+                           shortcut=None):
         action = QAction(QIcon(QPixmap(self.images[image])), name, self)
-        if not shortcut is None:
+        if shortcut is not None:
             action.setShortcut(shortcut)
         action.triggered.connect(function)
         toolbar.addAction(action)
@@ -92,7 +98,8 @@ class ReversiWindow(QMainWindow):
         else:
             image = self.images['empty.png']
         painter.drawImage(cell.y*s.IMG_SIZE,
-                          cell.x*s.IMG_SIZE + self.toolbar.height() + self.font_size,
+                          (cell.x*s.IMG_SIZE + self.toolbar.height()
+                           + self.font_size),
                           image)
 
     def draw_text(self, painter, font_size):
@@ -127,7 +134,8 @@ class ReversiWindow(QMainWindow):
     def mousePressEvent(self, QMouseEvent):
         if self.game.game_state == Game.States.human:
             position = QMouseEvent.pos()
-            position.setY(position.y() - self.toolbar.height() - self.font_size)
+            position.setY((position.y() - self.toolbar.height()
+                           - self.font_size))
             self.game.next_move(position)
             if self.game.game_state == Game.States.ai:
                 self.reset_count()
@@ -216,7 +224,8 @@ def main():
     namespace = reversi_parser.parse_args()
     reversi_window = ReversiWindow(namespace.size,
                                    argparser.get_mode(namespace),
-                                   argparser.get_difficulty_level(namespace), namespace.time)
+                                   argparser.get_difficulty_level(namespace),
+                                   namespace.time)
     reversi_window.load_images()
     sys.exit(app.exec_())
 
