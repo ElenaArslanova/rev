@@ -100,9 +100,9 @@ class Game:
             second_ai_player = RandomAIPlayer(second, self)
         else:
             first_ai_player = AIPlayer(first, self, self.difficulty_level,
-                                       time_for_move=self.time_for_move-1)
+                                       time_for_move=self.time_for_move - 1)
             second_ai_player = AIPlayer(second, self, self.difficulty_level,
-                                        time_for_move=self.time_for_move-1)
+                                        time_for_move=self.time_for_move - 1)
         if self.mode == self.Modes.human_human:
             self.game_state = self.States.human
             players = cycle((first_human_player, second_human_player))

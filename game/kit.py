@@ -90,17 +90,17 @@ class Board:
         next_move = self.get_next_move_in_direction(x, y, direction)
         if next_move is None:
             return
-        next_x = next_move['x']
-        next_y = next_move['y']
-        if self.board[next_x][next_y].get_state() == opposite:
+        if self.board[next_move['x']][next_move['y']].get_state() == opposite:
+            next_x = next_move['x']
+            next_y = next_move['y']
             while self.board[next_x][next_y].get_state() == opposite:
-                next_move = self.get_next_move_in_direction(next_x,
-                                                            next_y,
+                next_move = self.get_next_move_in_direction(next_move['x'],
+                                                            next_move['y'],
                                                             direction)
                 if next_move is None:
                     return
-            next_x = next_move['x']
-            next_y = next_move['y']
+                next_x = next_move['x']
+                next_y = next_move['y']
             if self.board[next_x][next_y].get_state() == s.EMPTY:
                 self.board[next_x][next_y].can_be_taken = True
 

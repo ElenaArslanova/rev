@@ -1,11 +1,15 @@
-from unittest import TestCase
+import unittest
 from random import choice
+import sys
+import os.path
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             os.path.pardir))
+from settings import WHITE
 from game.game import Game
 from game.montecarlo_ai import Node
-from settings import WHITE
 
 
-class TestNode(TestCase):
+class TestNode(unittest.TestCase):
     def setUp(self):
         self.game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
                          True, 5)
@@ -47,3 +51,7 @@ class TestNode(TestCase):
         move = choice(possible_moves)
         state = Game.get_next_state(self.root.state, move)
         return Node(state, move, len(state[0].get_moves(state[1])))
+
+
+if __name__ == '__main__':
+    unittest.main()

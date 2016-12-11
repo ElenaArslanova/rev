@@ -1,10 +1,14 @@
-from unittest import TestCase
+import unittest
 from game.game import Game
-from game.montecarlo_ai import MonteCarloAI, Node
 from settings import WHITE
+import os.path
+import sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             os.path.pardir))
+from game.montecarlo_ai import MonteCarloAI, Node
 
 
-class TestMonteCarloAI(TestCase):
+class TestMonteCarloAI(unittest.TestCase):
     def setUp(self):
         self.game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.hard,
                          True, 5)
@@ -51,3 +55,7 @@ class TestMonteCarloAI(TestCase):
         for child in children:
             self.root.add_child(child)
         self.assertEqual(self.ai.get_best_child(self.root), children[1])
+
+
+if __name__ == '__main__':
+    unittest.main()
