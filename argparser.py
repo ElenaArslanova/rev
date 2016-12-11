@@ -1,6 +1,7 @@
 import argparse
 from game.game import Game
 
+
 def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--size', type=positive, default=8,
@@ -16,11 +17,13 @@ def create_parser():
                              help='Человек против искусственного интеллекта')
     mode_parser.add_argument('-hh', '--human_human', action='store_true',
                              help='Человек против человека')
-    mode_parser.add_argument('-ah', '--ai_human', action = 'store_true',
+    mode_parser.add_argument('-ah', '--ai_human', action='store_true',
                              help='Искусственный интеллект против человека')
-    mode_parser.add_argument('-aa', '--ai_ai', action = 'store_true',
-            help='Искусственный интеллект против искусственного интеллекта')
+    mode_parser.add_argument(
+        '-aa', '--ai_ai', action='store_true',
+        help='Искусственный интеллект против искусственного интеллекта')
     return parser
+
 
 def positive(value):
     int_value = int(value)
@@ -28,6 +31,7 @@ def positive(value):
         raise argparse.ArgumentTypeError('%s is invalid positive int value' %
                                          value)
     return int_value
+
 
 def get_mode(namespace):
     if namespace.ai_ai:
@@ -38,6 +42,7 @@ def get_mode(namespace):
         return Game.Modes.human_ai
     else:
         return Game.Modes.human_human
+
 
 def get_difficulty_level(namespace):
     if namespace.level == 'easy':

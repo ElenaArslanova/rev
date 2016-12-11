@@ -10,6 +10,7 @@ from game import kit
 from game.game import Game
 import settings as s
 
+
 class TestBoard(unittest.TestCase):
     def test_valid_moves_corner(self):
         board = kit.Board(8)
@@ -17,7 +18,6 @@ class TestBoard(unittest.TestCase):
         board.board[2][7].set_white()
         board.mark_valid_moves(s.WHITE)
         self.assertEqual(board.board[0][7].can_be_taken, True)
-
 
     def test_clear_moves(self):
         board = kit.Board(8)

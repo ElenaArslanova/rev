@@ -92,15 +92,15 @@ class ReversiWindow(QMainWindow):
             image = self.images['black.png']
         elif cell.state == s.WHITE:
             image = self.images['white.png']
-        elif (cell.get_coordinates() in self.game.mover.next_possible_moves
-              and self.game.game_state != Game.States.ai):
+        elif (cell.get_coordinates() in self.game.mover.next_possible_moves and
+              self.game.game_state != Game.States.ai):
             image = self.images['possible_move.png']
         else:
             image = self.images['empty.png']
-        painter.drawImage(cell.y*s.IMG_SIZE,
-                          (cell.x*s.IMG_SIZE + self.toolbar.height()
-                           + self.font_size),
-                          image)
+        painter.drawImage(
+            cell.y*s.IMG_SIZE,
+            cell.x*s.IMG_SIZE + self.toolbar.height() + self.font_size,
+            image)
 
     def draw_text(self, painter, font_size):
         painter.setPen(QColor(Qt.black))
@@ -134,8 +134,8 @@ class ReversiWindow(QMainWindow):
     def mousePressEvent(self, QMouseEvent):
         if self.game.game_state == Game.States.human:
             position = QMouseEvent.pos()
-            position.setY((position.y() - self.toolbar.height()
-                           - self.font_size))
+            position.setY(
+                position.y() - self.toolbar.height() - self.font_size)
             self.game.next_move(position)
             if self.game.game_state == Game.States.ai:
                 self.reset_count()
@@ -164,8 +164,9 @@ class ReversiWindow(QMainWindow):
                             (self.game.get_winner_message()))
         message_box.exec_()
         if self.game_was_saved:
-            self.ask_question('Do you want to play from your last saved position?',
-                              message_box)
+            self.ask_question(
+                'Do you want to play from your last saved position?',
+                message_box)
             self.check_answer(message_box.exec_(), self.load_saved_game,
                               self.play_again_action)
         else:

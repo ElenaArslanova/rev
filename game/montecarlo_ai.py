@@ -25,15 +25,16 @@ class MonteCarloAI:
             root = self.state_node[state]
         else:
             children_amount = len(state[0].get_moves(state[1]))
-            if (not self.game.get_winner(state[0]) == self.colour
-                and children_amount == 0):
+            if (not self.game.get_winner(state[0]) == self.colour and
+                    children_amount == 0):
                 children_amount = 1
             root = Node(state, None, children_amount)
 
         root.parent = None
         start = time.time()
-        while (time.time() - start < self.simulation_time
-               and root.moves_left_to_expand > 0):
+        while (
+               time.time() - start < self.simulation_time and
+               root.moves_left_to_expand > 0):
             selected_node = self.select_node(root, start)
             result = self.run_simulation(selected_node.state)
             self.back_propagate(selected_node, result)
@@ -78,9 +79,11 @@ class MonteCarloAI:
         current_node = root
         while (time.time() - start_time < self.simulation_time and
                root.moves_left_to_expand > 0):
-            possible_moves = current_node.state[0].get_moves(current_node.state[1])
+            current_board = current_node.state[0]
+            current_player = current_node.state[1]
+            possible_moves = current_board.get_moves(current_player)
             if not possible_moves:
-                if self.game.get_winner(current_node.state[0]) == current_node.state[1]:
+                if self.game.get_winner(current_board) == current_player:
                     current_node.propagate_completion()
                     return current_node
                 else:
@@ -121,19 +124,20 @@ class MonteCarloAI:
         return best
 
     def run_simulation(self, state):
-        WIN = 1
-        LOSS = 0
+        win = 1
+        loss = 0
         state = deepcopy(state)
         while True:
             winner = self.game.get_winner(state[0])
             if winner:
                 if winner == self.colour:
-                    return WIN
+                    return win
                 else:
-                    return LOSS
+                    return loss
             moves = state[0].get_moves(state[1])
             if not moves:
-                state = (state[0], kit.Board.get_colour_of_other_player(state[1]))
+                state = (state[0],
+                         kit.Board.get_colour_of_other_player(state[1]))
                 moves = state[0].get_moves(state[1])
             picked_move = choice(moves)
             state = self.game.get_next_state(state, picked_move)
@@ -143,8 +147,8 @@ class MonteCarloAI:
         return wins / plays
 
     def get_ucb(self, wins, plays, parent_plays):
-        return (self.get_wins_plays_percentage(wins, plays)
-                + sqrt(2 * log(parent_plays) / plays))
+        return (self.get_wins_plays_percentage(wins, plays) +
+                sqrt(2 * log(parent_plays) / plays))
 
 
 class Node:
@@ -156,7 +160,7 @@ class Node:
         self.parent = None
         self.moves_expanded = set()
         self.moves_left_to_expand = children_amount
-        self.move = move # the move that led to this state
+        self.move = move  # the move that led to this state
 
     def propagate_completion(self):
         if self.parent is None:

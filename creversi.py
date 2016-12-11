@@ -1,6 +1,7 @@
 from game.game import Game
 import argparser
 
+
 def main():
     reversi_parser = argparser.create_parser()
     namespace = reversi_parser.parse_args()

@@ -13,7 +13,7 @@ class Game:
     BLACK_MSG = 'Black won!'
     Modes = Enum('Modes', 'human_human human_ai ai_human ai_ai',
                  module=__name__, qualname='Game.Modes')
-    States = Enum('GameStates', 'human ai', module = __name__,
+    States = Enum('GameStates', 'human ai', module=__name__,
                   qualname='Game.States')
     DifficultyLevels = Enum('DifficultyLevels', 'easy normal hard',
                             module=__name__, qualname='Game.DifficultyLevels')
@@ -54,7 +54,8 @@ class Game:
 
     def check_next_player_pass(self):
         cur_player = self.current_player
-        next_player_colour = Board.get_colour_of_other_player(cur_player.colour)
+        next_player_colour = Board.get_colour_of_other_player(
+            cur_player.colour)
         if not self.mover.board.has_moves(next_player_colour):
             self.pass_move()
 
@@ -74,7 +75,8 @@ class Game:
             self.mover.pass_move(player_colour)
             self.ai_player_passing = False
         else:
-            self.mover.pass_move(Board.get_colour_of_other_player(player_colour))
+            self.mover.pass_move(
+                Board.get_colour_of_other_player(player_colour))
         self.skip_player()
 
     def get_winner_message(self):
@@ -134,7 +136,9 @@ class Game:
         flipped_cells = board.move_flipped_cells[last_move_coordinates]
         for cell in flipped_cells:
             cell.flip()
-        board.board[last_move_coordinates[0]][last_move_coordinates[1]].set_empty()
+        last_x = last_move_coordinates[0]
+        last_y = last_move_coordinates[1]
+        board.board[last_x][last_y].set_empty()
         return board, Board.get_colour_of_other_player(player)
 
     def get_current_state(self):
@@ -161,13 +165,14 @@ class Game:
         if self.mover.current_move_number == 0:
             return
         opponent_last_move = self.mover.move_back()
-        opponent_previous_state = self.get_previous_state(self.get_current_state(),
-                                                 opponent_last_move)
+        opponent_previous_state = self.get_previous_state(
+            self.get_current_state(), opponent_last_move)
         last_move = self.mover.move_back()
         previous_state = self.get_previous_state(opponent_previous_state,
                                                  last_move)
-        self.mover.update_board(previous_state[0],
-                        Board.get_colour_of_other_player(previous_state[1]))
+        self.mover.update_board(
+            previous_state[0],
+            Board.get_colour_of_other_player(previous_state[1]))
 
     def redo(self):
         if self.mover.current_move_number == len(self.mover.moves):
@@ -177,5 +182,6 @@ class Game:
         opponent_next_move = self.mover.move_forward()
         opponent_next_state = self.get_next_state(next_state,
                                                   opponent_next_move)
-        self.mover.update_board(opponent_next_state[0],
-                    Board.get_colour_of_other_player(opponent_next_state[1]))
+        self.mover.update_board(
+            opponent_next_state[0],
+            Board.get_colour_of_other_player(opponent_next_state[1]))

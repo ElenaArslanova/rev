@@ -1,5 +1,6 @@
 import settings as s
 
+
 class Cell:
     def __init__(self, x, y):
         self.state = s.EMPTY
@@ -25,7 +26,8 @@ class Cell:
         elif self.state == s.WHITE:
             self.state = s.BLACK
         else:
-            raise ValueError("Cell in {} state can't be flipped".format(self.state.lower()))
+            raise ValueError("Cell in {} state can't be flipped".format(
+                self.state.lower()))
 
     def get_coordinates(self):
         return self.x, self.y
@@ -88,15 +90,19 @@ class Board:
         next_move = self.get_next_move_in_direction(x, y, direction)
         if next_move is None:
             return
-        if self.board[next_move['x']][next_move['y']].get_state() == opposite:
-            while self.board[next_move['x']][next_move['y']].get_state() == opposite:
-                next_move = self.get_next_move_in_direction(next_move['x'],
-                                                            next_move['y'],
+        next_x = next_move['x']
+        next_y = next_move['y']
+        if self.board[next_x][next_y].get_state() == opposite:
+            while self.board[next_x][next_y].get_state() == opposite:
+                next_move = self.get_next_move_in_direction(next_x,
+                                                            next_y,
                                                             direction)
                 if next_move is None:
                     return
-            if self.board[next_move['x']][next_move['y']].get_state() == s.EMPTY:
-                self.board[next_move['x']][next_move['y']].can_be_taken = True
+            next_x = next_move['x']
+            next_y = next_move['y']
+            if self.board[next_x][next_y].get_state() == s.EMPTY:
+                self.board[next_x][next_y].can_be_taken = True
 
     def clear_moves(self):
         cells = (self.board[x][y] for x in range(self.size)

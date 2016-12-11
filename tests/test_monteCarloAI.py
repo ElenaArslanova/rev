@@ -40,12 +40,11 @@ class TestMonteCarloAI(TestCase):
         self.assertTrue(node.plays == 1)
         self.assertTrue(node.wins == 1)
 
-
     def test_get_best_child(self):
-        children  = [Node(self.game.get_next_state(self.root.state, (1, 2)),
-                      (1, 2), 3),
-                     Node(self.game.get_next_state(self.root.state, (2, 1)),
-                      (2, 1), 3)]
+        children = [Node(self.game.get_next_state(self.root.state, (1, 2)),
+                    (1, 2), 3),
+                    Node(self.game.get_next_state(self.root.state, (2, 1)),
+                    (2, 1), 3)]
         children[0].plays, children[0].wins = 2, 1
         children[1].plays, children[1].wins = 1, 0
         self.root.plays = 3

@@ -10,8 +10,8 @@ class TestNode(TestCase):
         self.game = Game(3, Game.Modes.human_human, Game.DifficultyLevels.easy,
                          True, 5)
         first_move = (1, 2)
-        first_state = Game.get_next_state((self.game.mover.board, WHITE),
-                                               first_move)
+        first_state = Game.get_next_state(
+            (self.game.mover.board, WHITE), first_move)
         self.root_possible_moves = self.game.mover.board.get_moves(WHITE)
         self.root = Node(first_state, first_move,
                          len(self.root_possible_moves))
@@ -28,7 +28,6 @@ class TestNode(TestCase):
         self.assertTrue(child.moves_left_to_expand ==
                         child_moves_to_expand - 1)
         self.assertTrue(self.root.moves_left_to_expand == root_moves_to_expand)
-
 
     def test_add_child(self):
         child = self.get_child(self.root)

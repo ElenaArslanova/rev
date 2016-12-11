@@ -54,4 +54,3 @@ class Mover:
         self.board = board
         self.board.update_cell_count()
         self.pass_move(player_colour)
-
